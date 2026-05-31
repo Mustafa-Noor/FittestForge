@@ -33,4 +33,24 @@ class UserRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun updatePersonalityMode(mode: String): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid ?: throw Exception("User not authenticated")
+            usersCollection.document(uid).update("personalityMode", mode).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateMomentum(value: Float): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid ?: throw Exception("User not authenticated")
+            usersCollection.document(uid).update("momentum", value).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

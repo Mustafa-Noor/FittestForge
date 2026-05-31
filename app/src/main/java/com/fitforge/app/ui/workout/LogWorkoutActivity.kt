@@ -18,8 +18,8 @@ class LogWorkoutActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.btnLifeHappened.setOnClickListener {
-            // Show RecoveryBottomSheetDialog (would normally extend BottomSheetDialogFragment)
-            Toast.makeText(this, "Recovery Sheet Opened", Toast.LENGTH_SHORT).show()
+            // Show RecoveryBottomSheetDialog
+            RecoveryLogBottomSheet().show(supportFragmentManager, "recovery_log")
         }
 
         binding.btnFinishWorkout.setOnClickListener {
