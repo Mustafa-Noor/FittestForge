@@ -29,18 +29,25 @@
             android:theme="@style/Theme.FitForge" />
 
         <!-- Auth Activities -->
-        <activity android:name=".ui.auth.LoginActivity" android:exported="false" android:theme="@style/Theme.FitForge" />
-        <activity android:name=".ui.auth.SignupActivity" android:exported="false" android:theme="@style/Theme.FitForge" />
-        <activity android:name=".ui.auth.ForgotPasswordActivity" android:exported="false" android:theme="@style/Theme.FitForge" />
+        <activity android:name=".ui.auth.LoginActivity" android:exported="false" />
+        <activity android:name=".ui.auth.SignupActivity" android:exported="false" />
+        <activity android:name=".ui.auth.ForgotPasswordActivity" android:exported="false" />
         
         <!-- Onboarding -->
-        <activity android:name=".ui.onboarding.OnboardingActivity" android:exported="false" android:theme="@style/Theme.FitForge" />
+        <activity android:name=".ui.onboarding.OnboardingActivity" android:exported="false" />
 
-        <!-- Workout Flow (Phase 5) -->
+        <!-- Workout Flow -->
         <activity android:name=".ui.workout.LogWorkoutActivity" android:exported="false" />
         <activity android:name=".ui.workout.ExerciseDetailActivity" android:exported="false" />
         <activity android:name=".ui.workout.WorkoutCompleteActivity" android:exported="false" />
 
-            <activity android:name=".ui.profile.EditProfileActivity" android:exported="false" />`n        <activity android:name=".ui.profile.SettingsActivity" android:exported="false" />`n    </application>
+        <!-- Profile Flow -->
+        <activity android:name=".ui.profile.EditProfileActivity" android:exported="false" />
+        <activity android:name=".ui.profile.SettingsActivity" android:exported="false" />
+
+        <!-- Receiver for Notifications -->
+        <receiver android:name=".notifications.RoastReceiver" android:exported="false" />
+
+    </application>
 
 </manifest>

@@ -16,8 +16,8 @@ class WorkoutRepository {
     suspend fun saveWorkout(workout: Workout): Result<Unit> {
         return try {
             val document = getWorkoutCollection().document()
-            workout.id = document.id
-            document.set(workout).await()
+            val workoutWithId = workout.copy(id = document.id)
+            document.set(workoutWithId).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -27,8 +27,21 @@ class WorkoutRepository {
     suspend fun getRecentWorkouts(limit: Long = 10): Result<List<Workout>> {
         return try {
             val snapshot = getWorkoutCollection()
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .limit(limit)
+                .get()
+                .await()
+            val workouts = snapshot.toObjects(Workout::class.java)
+            Result.success(workouts)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getWorkouts(): Result<List<Workout>> {
+        return try {
+            val snapshot = getWorkoutCollection()
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .await()
             val workouts = snapshot.toObjects(Workout::class.java)
