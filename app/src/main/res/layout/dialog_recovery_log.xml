@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Life Happened 💛"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Log a protected day — your momentum stays safe"
+        android:textColor="@color/text_secondary" />
+
+    <!-- RadioGroup for reasons -->
+    <RadioGroup
+        android:id="@+id/rgReasons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp">
+        <RadioButton android:id="@+id/rbRest" android:text="😴 Rest Day" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/rbSick" android:text="🤒 Not Feeling Well" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/rbStudy" android:text="📚 Exams / Study" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/rbTravel" android:text="✈️ Travelling" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/rbOther" android:text="📝 Other" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnProtect"
+        style="@style/Btn.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="PROTECT MY DAY" />
+
+</LinearLayout>

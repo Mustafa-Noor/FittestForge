@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ── Primary Brand ──────────────────────────── -->
+    <color name="primary">#FF6B35</color>          <!-- Vibrant coral-orange — energy, action -->
+    <color name="primary_dark">#E85A24</color>     <!-- Pressed state -->
+    <color name="primary_light">#FFE8DF</color>    <!-- Tinted background, chips -->
+    <color name="primary_container">#FFF0EB</color><!-- Card accent bg -->
+
+    <!-- ── Accent / Secondary ─────────────────────── -->
+    <color name="accent">#6C63FF</color>           <!-- Purple — AI, badges, highlights -->
+    <color name="accent_light">#EEE9FF</color>
+
+    <!-- ── Success / Positive ─────────────────────── -->
+    <color name="success">#00C48C</color>          <!-- Teal-green — momentum, streaks -->
+    <color name="success_light">#D6FFF4</color>
+
+    <!-- ── Warning / Recovery ─────────────────────── -->
+    <color name="warning">#FFB300</color>          <!-- Amber — life happened, rest days -->
+    <color name="warning_light">#FFF8E1</color>
+
+    <!-- ── Error ──────────────────────────────────── -->
+    <color name="error">#FF5252</color>
+    <color name="error_light">#FFEBEE</color>
+
+    <!-- ── Backgrounds (Light Theme) ─────────────── -->
+    <color name="bg_primary">#FFFFFF</color>       <!-- Pure white — main background -->
+    <color name="bg_secondary">#F8F9FA</color>     <!-- Off-white — card bg, tabs -->
+    <color name="bg_tertiary">#F1F3F5</color>      <!-- Light gray — input bg, dividers -->
+
+    <!-- ── Text ───────────────────────────────────── -->
+    <color name="text_primary">#1A1A2E</color>     <!-- Near black — headings -->
+    <color name="text_secondary">#6B7280</color>   <!-- Gray — subtitles, hints -->
+    <color name="text_disabled">#9CA3AF</color>    <!-- Placeholder text -->
+    <color name="text_on_primary">#FFFFFF</color>  <!-- White text on orange bg -->
+
+    <!-- ── Borders / Dividers ─────────────────────── -->
+    <color name="divider">#E5E7EB</color>
+    <color name="border">#D1D5DB</color>
+
+    <!-- ── Personality Mode Colors ───────────────── -->
+    <color name="mode_hype">#FF6B35</color>        <!-- Orange — Hype Man -->
+    <color name="mode_drill">#1A1A2E</color>       <!-- Dark navy — Drill Sergeant -->
+    <color name="mode_chill">#00C48C</color>       <!-- Teal — Chill Coach -->
+    <color name="mode_chaos">#6C63FF</color>       <!-- Purple — Chaos Goblin -->
+
+    <!-- ── Misc ───────────────────────────────────── -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="shadow">#1A000000</color>
+</resources>

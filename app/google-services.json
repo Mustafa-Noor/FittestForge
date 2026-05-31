@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "143471276224",
+    "project_id": "fittestforge",
+    "storage_bucket": "fittestforge.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143471276224:android:e3734863515427f628fd25",
+        "android_client_info": {
+          "package_name": "com.fitforge.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0AWO_xYnWPZ-Z-T1csl0m4aLi_GB3b2g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
