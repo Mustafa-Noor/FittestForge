@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.fitforge.app.databinding.FragmentWorkoutBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class WorkoutFragment : Fragment() {
 
@@ -27,8 +28,27 @@ class WorkoutFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Setup the viewpager and tablayout
-        // For simplicity, we can use a basic ViewPager implementation or swap content
+        val adapter = WorkoutPagerAdapter(this)
+        binding.viewPager.adapter = adapter
+
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Library"
+                1 -> "History"
+                else -> null
+            }
+        }.attach()
+    }
+
+    private inner class WorkoutPagerAdapter(fragment: Fragment) :
+        FragmentStateAdapter(fragment) {
+        override fun getItemCount(): Int = 2
+        override fun createFragment(position: Int): Fragment {
+            return when (position) {
+                0 -> ExerciseLibraryFragment()
+                else -> WorkoutHistoryFragment()
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -11,8 +11,10 @@
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:windowBackground">@color/bg_primary</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">@color/bg_primary</item>
+        <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:navigationBarColor">@color/bg_primary</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <!-- Rounded corners on all Material components -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeSmall</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeMedium</item>
@@ -27,6 +29,10 @@
     </style>
     <style name="ShapeLarge" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MaterialComponents.Indicator.Circle" parent="">
+        <item name="cornerSize">50%</item>
     </style>
 
     <!-- Text Styles -->

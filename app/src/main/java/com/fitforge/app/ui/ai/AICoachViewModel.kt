@@ -44,13 +44,19 @@ class AICoachViewModel : ViewModel() {
                 val userResult = userRepository.getUserProfile()
                 val user = userResult.getOrNull()
                 
+                val recentWorkoutsResult = workoutRepository.getRecentWorkouts(5)
+                val recentWorkouts = recentWorkoutsResult.getOrDefault(emptyList())
+                val workoutSummary = recentWorkouts.joinToString("\n") { w ->
+                    "- ${w.dateString}: ${w.exercises.joinToString { it.exerciseName }} (${w.durationMinutes} min)"
+                }
+
                 val systemPrompt = """
                     You are the FitForge AI Coach. The user's personality mode is ${user?.personalityMode ?: "hype"}.
                     Personality behavior:
-                    - "hype": enthusiastic, lots of energy, use motivational language, occasional caps for emphasis
-                    - "drill": direct, no fluff, military-style brevity, no excuses accepted
-                    - "chill": calm, supportive, no pressure, understanding tone
-                    - "chaos": funny, meme-aware, Gen Z language, roast them lightly when appropriate
+                    - "hype": enthusiastic, lots of energy, use motivational language, occasional caps for emphasis, emojis.
+                    - "drill": direct, no fluff, military-style brevity, no excuses accepted, very serious.
+                    - "chill": calm, supportive, no pressure, understanding tone, mindful.
+                    - "chaos": funny, meme-aware, Gen Z language, roast them lightly when appropriate, unpredictable but helpful.
 
                     User context:
                     - Name: ${user?.displayName ?: "Athlete"}
@@ -58,6 +64,9 @@ class AICoachViewModel : ViewModel() {
                     - Total workouts: ${user?.totalWorkouts ?: 0}
                     - Fitness goal: ${user?.fitnessGoal ?: "stay active"}
                     - Current streak: ${user?.currentStreak ?: 0} days
+                    
+                    Recent Workouts:
+                    $workoutSummary
 
                     Keep responses concise (under 120 words). Be practical. No medical advice.
                     Always end with a small actionable suggestion.

@@ -1,54 +1,231 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:background="@color/bg_primary">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
-        <TextView
-            style="@style/TextStyle.Heading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Momentum Over Time" />
-
-        <com.google.android.material.card.MaterialCardView
-            style="@style/Card.Default"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="16dp">
-            
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/momentumLineChart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp"/>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            style="@style/TextStyle.Heading"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Workout DNA" />
+            android:orientation="vertical"
+            android:padding="20dp">
 
-        <com.google.android.material.card.MaterialCardView
-            style="@style/Card.Default"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:textStyle="bold"
+                android:text="Your Progress"
+                android:textColor="@color/text_primary"
+                android:textSize="28sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Data-driven gains"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_marginTop="16dp">
-            
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/dnaBarChart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp"/>
-        </com.google.android.material.card.MaterialCardView>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+            <!-- Momentum History -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Card.Default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:text="Momentum Over Time"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/momentumLineChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp"
+                        android:layout_marginTop="12dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Workout DNA Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardWorkoutDNA"
+                style="@style/Card.Default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="@color/primary_container">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvDnaTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-black"
+                android:textStyle="bold"
+                            android:text="YOUR WORKOUT DNA"
+                            android:textColor="@color/primary"
+                            android:textSize="14sp"
+                            android:letterSpacing="0.1"/>
+
+                        <ImageButton
+                            android:id="@+id/btnShareDNA"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_alignParentEnd="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:visibility="gone"
+                            app:tint="@color/primary" />
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/primary"
+                        android:alpha="0.2"/>
+
+                    <TextView
+                        android:id="@+id/tvArchetype"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-black"
+                android:textStyle="bold"
+                        android:text="Push-Day Loyalist"
+                        android:textColor="@color/text_primary"
+                        android:textSize="22sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvDnaAvgWorkouts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="8dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="📅 Avg 3.2 workouts/week"
+                            android:textColor="@color/text_secondary"
+                            app:drawableTint="@color/primary"/>
+
+                        <TextView
+                            android:id="@+id/tvDnaTopMuscle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="🎯 Chest dominates (42%)"
+                            android:textColor="@color/text_secondary"
+                            app:drawableTint="@color/primary"/>
+
+                        <TextView
+                            android:id="@+id/tvDnaPeakDay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="⚡ Peak day: Saturday"
+                            android:textColor="@color/text_secondary"
+                            app:drawableTint="@color/primary"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Muscle Balance Chart -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:text="Muscle Group Balance"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Card.Default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp">
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/balancePieChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:padding="16dp"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Badge Collection -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:text="Badge Collection"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBadges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
+                tools:layoutManager="GridLayoutManager"
+                tools:spanCount="3"
+                tools:listitem="@layout/item_badge" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

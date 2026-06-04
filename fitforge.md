@@ -1037,7 +1037,7 @@ Always end with a small actionable suggestion.
 ```kotlin
 val model = GenerativeModel(
     modelName = "gemini-1.5-flash",
-    apiKey = BuildConfig.GEMINI_API_KEY
+    apiKey = BuildConfig.GMINI_AEPI_KEY
 )
 val chat = model.startChat(history = previousMessages)
 val response = chat.sendMessage(userMessage)

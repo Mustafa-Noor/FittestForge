@@ -45,8 +45,11 @@ class AICoachFragment : Fragment() {
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            // In a real app, show a typing indicator
             binding.btnSend.isEnabled = !isLoading
+            binding.layoutTyping.visibility = if (isLoading) View.VISIBLE else View.GONE
+            if (isLoading) {
+                binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount)
+            }
         }
 
         binding.btnSend.setOnClickListener {

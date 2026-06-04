@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <FrameLayout
+            android:id="@+id/badgeImageContainer"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_badge_locked">
+
+            <TextView
+                android:id="@+id/tvBadgeEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="32sp"
+                android:text="🔒" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvBadgeName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:text="Locked"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
