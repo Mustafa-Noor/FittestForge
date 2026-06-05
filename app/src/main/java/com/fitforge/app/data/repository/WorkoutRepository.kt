@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 
 class WorkoutRepository {
     private val auth = FirebaseAuth.getInstance()
@@ -20,7 +21,14 @@ class WorkoutRepository {
     suspend fun saveWorkoutAndUpdateStats(workout: Workout): Result<String> {
         return try {
             val workoutRef = getWorkoutCollection().document()
-            val workoutWithId = workout.copy(id = workoutRef.id)
+            val normalizedExercises = workout.exercises.map { exercise ->
+                exercise.copy(
+                    sets = exercise.sets.mapIndexed { index, set ->
+                        set.copy(setNumber = index + 1)
+                    }
+                )
+            }
+            val workoutWithId = workout.copy(id = workoutRef.id, exercises = normalizedExercises)
             
             val batch = db.batch()
             batch.set(workoutRef, workoutWithId)
@@ -87,8 +95,12 @@ class WorkoutRepository {
                 .get()
                 .await()
             val workouts = snapshot.toObjects(Workout::class.java)
-            val counts = workouts.flatMap { it.exercises }
-                .groupBy { it.muscleGroup }
+            val counts = workouts
+                .filter { !it.isRecoveryDay }
+                .flatMap { it.exercises }
+                .map { it.muscleGroup.trim() }
+                .filter { it.isNotBlank() }
+                .groupBy { it }
                 .mapValues { it.value.size }
             Result.success(counts)
         } catch (e: Exception) {
@@ -107,11 +119,12 @@ class WorkoutRepository {
 
     suspend fun getWorkoutsForProgress(limitDays: Int): Result<List<Workout>> {
         return try {
+            val startDate = LocalDate.now().minusDays(limitDays.toLong()).toString()
             val snapshot = getWorkoutCollection()
                 .whereEqualTo("deleted", false)
                 .whereEqualTo("isRecoveryDay", false)
+                .whereGreaterThanOrEqualTo("dateString", startDate)
                 .orderBy("dateString", Query.Direction.DESCENDING)
-                .limit(limitDays.toLong())
                 .get()
                 .await()
             val workouts = snapshot.toObjects(Workout::class.java)

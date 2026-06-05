@@ -74,8 +74,32 @@
                         android:layout_width="match_parent"
                         android:layout_height="220dp"
                         android:layout_marginTop="12dp" />
+
+                    <TextView
+                        android:id="@+id/tvMomentumEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="You have not worked out yet. Finish your first workout to start this graph."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvNoWorkoutMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@color/bg_secondary"
+                android:padding="14dp"
+                android:text="You have not worked out yet. Log a workout and this page will fill in with your real progress."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
             <!-- Workout DNA Card -->
             <com.google.android.material.card.MaterialCardView
@@ -193,11 +217,27 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp">
 
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/balancePieChart"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:padding="16dp"/>
+                    android:layout_height="250dp">
+
+                    <TextView
+                        android:id="@+id/tvBalanceEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="Muscle balance will appear after you log exercises."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/balancePieChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="16dp" />
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Badge Collection -->

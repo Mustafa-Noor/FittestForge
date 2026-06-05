@@ -13,7 +13,12 @@ import com.fitforge.app.adapters.BadgeAdapter
 import com.fitforge.app.databinding.FragmentProgressBinding
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -39,26 +44,23 @@ class ProgressFragment : Fragment() {
         setupBadgeRecyclerView()
         setupCharts()
         observeViewModel()
-
         viewModel.loadProgressData()
     }
 
     private fun setupBadgeRecyclerView() {
         badgeAdapter = BadgeAdapter { badge ->
-            if (badge.isUnlocked) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(badge.name)
-                    .setMessage(badge.description)
-                    .setPositiveButton("Awesome", null)
-                    .show()
-            }
+            val message = if (badge.isUnlocked) badge.description else "Locked: ${badge.unlockConditionText}"
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(badge.name)
+                .setMessage(message)
+                .setPositiveButton("Got it", null)
+                .show()
         }
         binding.rvBadges.layoutManager = GridLayoutManager(context, 3)
         binding.rvBadges.adapter = badgeAdapter
     }
 
     private fun setupCharts() {
-        // Momentum Line Chart Setup
         binding.momentumLineChart.apply {
             description.isEnabled = false
             legend.isEnabled = false
@@ -73,7 +75,6 @@ class ProgressFragment : Fragment() {
             animateX(1000, Easing.EaseInOutQuad)
         }
 
-        // Balance Pie Chart Setup
         binding.balancePieChart.apply {
             description.isEnabled = false
             isDrawHoleEnabled = true
@@ -86,10 +87,18 @@ class ProgressFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.momentumData.observe(viewLifecycleOwner) { points ->
+            val hasData = points.isNotEmpty()
+            binding.momentumLineChart.visibility = if (hasData) View.VISIBLE else View.GONE
+            binding.tvMomentumEmpty.visibility = if (hasData) View.GONE else View.VISIBLE
+            if (!hasData) {
+                binding.momentumLineChart.clear()
+                return@observe
+            }
+
             val entries = points.mapIndexed { index, point ->
                 Entry(index.toFloat(), point.value)
             }
-            val dataSet = LineDataSet(entries, "Momentum").apply {
+            val dataSet = LineDataSet(entries, "Logged Sets").apply {
                 color = resources.getColor(R.color.primary, null)
                 setCircleColor(resources.getColor(R.color.primary, null))
                 lineWidth = 3f
@@ -101,23 +110,39 @@ class ProgressFragment : Fragment() {
                 mode = LineDataSet.Mode.CUBIC_BEZIER
             }
             binding.momentumLineChart.data = LineData(dataSet)
-            binding.momentumLineChart.xAxis.valueFormatter = IndexAxisValueFormatter(points.map { it.date.takeLast(5) })
+            binding.momentumLineChart.xAxis.valueFormatter =
+                IndexAxisValueFormatter(points.map { it.date.takeLast(5) })
             binding.momentumLineChart.invalidate()
         }
 
         viewModel.workoutDNA.observe(viewLifecycleOwner) { dna ->
             binding.tvArchetype.text = dna.archetype
-            binding.tvDnaAvgWorkouts.text = "📅 Avg ${String.format("%.1f", dna.avgWorkoutsPerWeek)} workouts/week"
-            binding.tvDnaTopMuscle.text = "🎯 ${dna.topMuscleGroup} dominates (${dna.topMuscleGroupPercent}%)"
-            binding.tvDnaPeakDay.text = "⚡ Peak day: ${dna.peakDay}"
-            
-            // Populate Pie Chart with muscle distribution (Mocking distribution for now based on top muscle)
-            val pieEntries = mutableListOf<PieEntry>()
-            pieEntries.add(PieEntry(dna.topMuscleGroupPercent.toFloat(), dna.topMuscleGroup))
-            pieEntries.add(PieEntry((100 - dna.topMuscleGroupPercent).toFloat(), "Others"))
-            
+            binding.tvDnaAvgWorkouts.text = "Avg ${String.format("%.1f", dna.avgWorkoutsPerWeek)} workouts/week"
+            binding.tvDnaTopMuscle.text = "${dna.topMuscleGroup} focus (${dna.topMuscleGroupPercent}%)"
+            binding.tvDnaPeakDay.text = "Peak day: ${dna.peakDay}"
+        }
+
+        viewModel.muscleGroupData.observe(viewLifecycleOwner) { muscleData ->
+            val hasData = muscleData.isNotEmpty()
+            binding.balancePieChart.visibility = if (hasData) View.VISIBLE else View.GONE
+            binding.tvBalanceEmpty.visibility = if (hasData) View.GONE else View.VISIBLE
+            if (!hasData) {
+                binding.balancePieChart.clear()
+                return@observe
+            }
+
+            val pieEntries = muscleData
+                .filter { it.key.isNotBlank() && it.value > 0 }
+                .map { PieEntry(it.value.toFloat(), it.key) }
+
             val pieDataSet = PieDataSet(pieEntries, "").apply {
-                colors = listOf(resources.getColor(R.color.primary, null), resources.getColor(R.color.divider, null))
+                colors = listOf(
+                    resources.getColor(R.color.primary, null),
+                    resources.getColor(R.color.success, null),
+                    resources.getColor(R.color.warning, null),
+                    resources.getColor(R.color.accent, null),
+                    resources.getColor(R.color.text_secondary, null)
+                )
                 valueTextSize = 12f
                 sliceSpace = 3f
             }
@@ -126,13 +151,13 @@ class ProgressFragment : Fragment() {
             binding.balancePieChart.invalidate()
         }
 
-        // Mock badges for now
-        badgeAdapter.submitList(listOf(
-            com.fitforge.app.data.models.Badge("1", "Early Bird", "🌅", "Workout before 8 AM", true),
-            com.fitforge.app.data.models.Badge("2", "Streak King", "👑", "7 day streak", true),
-            com.fitforge.app.data.models.Badge("3", "Heavy Lifter", "🏋️", "Lift 100kg total", false),
-            com.fitforge.app.data.models.Badge("4", "Consistency", "📈", "30 days active", false)
-        ))
+        viewModel.badges.observe(viewLifecycleOwner) { badges ->
+            badgeAdapter.submitList(badges)
+        }
+
+        viewModel.hasWorkoutData.observe(viewLifecycleOwner) { hasData ->
+            binding.tvNoWorkoutMessage.visibility = if (hasData) View.GONE else View.VISIBLE
+        }
     }
 
     override fun onDestroyView() {

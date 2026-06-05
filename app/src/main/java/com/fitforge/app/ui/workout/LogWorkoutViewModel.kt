@@ -35,8 +35,20 @@ class LogWorkoutViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val durationMinutes = ((System.currentTimeMillis() - startTimeMillis) / 60000).toInt()
-                val totalSets = exercises.sumOf { it.sets.size }
+                val normalizedExercises = exercises.map { exercise ->
+                    exercise.copy(
+                        sets = exercise.sets.mapIndexed { index, set ->
+                            set.copy(setNumber = index + 1)
+                        }
+                    )
+                }
+                val totalSets = normalizedExercises.sumOf { exercise ->
+                    exercise.sets.count { it.completed }
+                }.let { completedSets ->
+                    if (completedSets > 0) completedSets else normalizedExercises.sumOf { it.sets.size }
+                }
                 val today = LocalDate.now().toString()
+                val userBeforeSave = userRepository.getUserStats().getOrThrow()
 
                 val workout = Workout(
                     date = Timestamp.now(),
@@ -45,36 +57,37 @@ class LogWorkoutViewModel : ViewModel() {
                     totalSets = totalSets,
                     notes = notes,
                     isRecoveryDay = false,
-                    exercises = exercises
+                    exercises = normalizedExercises
                 )
 
                 // 1. Save workout and update base stats
                 workoutRepository.saveWorkoutAndUpdateStats(workout).getOrThrow()
 
-                // 2. Fetch updated user and all workouts for badge check
-                val user = userRepository.getUserStats().getOrThrow()
-                val allWorkouts = workoutRepository.getWorkouts().getOrThrow()
-
-                // 3. Check and unlock badges
-                val newBadges = BadgeChecker.checkAndUnlock(user, allWorkouts)
-                newBadges.forEach { badgeId ->
-                    userRepository.unlockBadge(badgeId).getOrThrow()
-                }
-
-                // 4. Calculate new momentum
+                // 2. Calculate momentum and streak from the pre-save user snapshot.
                 val newMomentum = MomentumCalculator.calculateNewMomentum(
-                    currentValue = user.momentum,
-                    daysMissed = 0, // Just completed a workout
+                    currentValue = userBeforeSave.momentum,
+                    daysMissed = 0,
                     workoutCompleted = true,
                     lifeHappened = false
                 )
+                val newStreak = calculateNewStreak(userBeforeSave.currentStreak, userBeforeSave.lastWorkoutDate, today)
+                val bestStreak = if (newStreak > userBeforeSave.bestStreak) newStreak else userBeforeSave.bestStreak
 
-                // 5. Calculate new streak
-                val newStreak = calculateNewStreak(user.currentStreak, user.lastWorkoutDate, today)
-                val bestStreak = if (newStreak > user.bestStreak) newStreak else user.bestStreak
-
-                // 6. Update momentum and streak
                 userRepository.updateMomentumAndStreak(newMomentum, newStreak, bestStreak, today).getOrThrow()
+
+                // 3. Fetch workouts and check badges with this workout's new momentum/streak included.
+                val allWorkouts = workoutRepository.getWorkouts().getOrThrow()
+                val userForBadges = userBeforeSave.copy(
+                    momentum = newMomentum,
+                    currentStreak = newStreak,
+                    bestStreak = bestStreak,
+                    lastWorkoutDate = today
+                )
+
+                val newBadges = BadgeChecker.checkAndUnlock(userForBadges, allWorkouts)
+                newBadges.forEach { badgeId ->
+                    userRepository.unlockBadge(badgeId).getOrThrow()
+                }
 
                 _saveResult.value = Result.success(SaveResult(newBadges, newMomentum, newStreak, durationMinutes, totalSets))
             } catch (e: Exception) {

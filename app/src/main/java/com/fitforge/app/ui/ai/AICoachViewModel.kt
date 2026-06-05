@@ -56,9 +56,21 @@ class AICoachViewModel : ViewModel() {
     }
 
     private fun buildSystemPrompt(user: User?, recentWorkouts: List<Workout>): String {
-        val workoutSummary = recentWorkouts.joinToString("\n") { w ->
-            "- ${w.dateString}: ${w.exercises.joinToString { it.exerciseName }} (${w.durationMinutes} min)"
-        }
+        val workoutSummary = recentWorkouts
+            .take(5)
+            .joinToString("\n") { workout ->
+                val names = workout.exercises
+                    .take(4)
+                    .joinToString { it.exerciseName.ifBlank { "Unnamed exercise" } }
+                val muscleGroups = workout.exercises
+                    .map { it.muscleGroup }
+                    .filter { it.isNotBlank() }
+                    .distinct()
+                    .take(3)
+                    .joinToString()
+                "- ${workout.dateString}: ${names.ifBlank { "Recovery day" }}; muscles: ${muscleGroups.ifBlank { "n/a" }}; ${workout.totalSets} sets; ${workout.durationMinutes} min"
+            }
+            .ifBlank { "No workouts logged yet." }
 
         return """
             You are the FitForge AI Coach. The user's personality mode is ${user?.personalityMode ?: "hype"}.
@@ -72,13 +84,18 @@ class AICoachViewModel : ViewModel() {
             - Name: ${user?.displayName ?: "Athlete"}
             - Current momentum: ${user?.momentum ?: 50}%
             - Total workouts: ${user?.totalWorkouts ?: 0}
+            - Total minutes trained: ${user?.totalMinutes ?: 0}
             - Fitness goal: ${user?.fitnessGoal ?: "stay active"}
             - Current streak: ${user?.currentStreak ?: 0} days
+            - Best streak: ${user?.bestStreak ?: 0} days
+            - Last workout date: ${user?.lastWorkoutDate?.ifBlank { "none" } ?: "none"}
+            - Last muscle group: ${user?.lastMuscleGroup?.ifBlank { "none" } ?: "none"}
             
             Recent Workouts:
             $workoutSummary
 
             Keep responses concise (under 120 words). Be practical. No medical advice.
+            Use the user's actual data when it is relevant, but do not dump all stats unless asked.
             Always end with a small actionable suggestion.
         """.trimIndent()
     }
@@ -121,7 +138,7 @@ class AICoachViewModel : ViewModel() {
 
         val sessionData = mapOf(
             "sessionDate" to com.google.firebase.Timestamp.now(),
-            "messages" to msgs.map { 
+            "messages" to msgs.takeLast(50).map {
                 mapOf(
                     "role" to if (it.isUser) "user" else "model",
                     "text" to it.text,

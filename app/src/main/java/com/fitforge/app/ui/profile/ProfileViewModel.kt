@@ -18,7 +18,7 @@ class ProfileViewModel : ViewModel() {
     private val _badges = MutableLiveData<List<Badge>>()
     val badges: LiveData<List<Badge>> = _badges
 
-    private val _isLoading = MutableLiveData<Boolean>(false)
+    private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _error = MutableLiveData<String>()
@@ -28,13 +28,14 @@ class ProfileViewModel : ViewModel() {
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val result = userRepository.getUserStats()
-                result.onSuccess { userDoc ->
-                    _user.value = userDoc
-                    _badges.value = getBadgesWithStatus(userDoc.badges)
-                }.onFailure {
-                    _error.value = "Failed to load profile"
-                }
+                userRepository.getUserStats()
+                    .onSuccess { userDoc ->
+                        _user.value = userDoc
+                        _badges.value = getBadgesWithStatus(userDoc.badges)
+                    }
+                    .onFailure {
+                        _error.value = "Failed to load profile"
+                    }
             } catch (e: Exception) {
                 _error.value = e.message ?: "Unknown error"
             } finally {
@@ -44,16 +45,20 @@ class ProfileViewModel : ViewModel() {
     }
 
     private fun getBadgesWithStatus(unlockedMap: Map<String, Boolean>): List<Badge> {
-        val allBadges = listOf(
-            Badge("first_workout", "First Blood", "🔥", "Completed your first workout", unlockConditionText = "Log any workout"),
-            Badge("workouts_5", "High Five", "🖐️", "Completed 5 workouts", unlockConditionText = "Log 5 workouts"),
-            Badge("workouts_30", "Iron Veteran", "🛡️", "Completed 30 workouts", unlockConditionText = "Log 30 workouts"),
-            Badge("streak_7", "Weekly Warrior", "📅", "7-day workout streak", unlockConditionText = "Work out 7 days in a row"),
-            Badge("momentum_peak", "Peak Performance", "⚡", "Reach 85 momentum", unlockConditionText = "Get momentum above 85"),
-            Badge("leg_day_respect", "Leg Day Hero", "🍗", "Logged legs twice in a row", unlockConditionText = "Don't skip leg day!")
-        )
-        
-        return allBadges.map { badge ->
+        return listOf(
+            Badge("first_workout", "First Workout", "FW", "Completed your first workout", unlockConditionText = "Log any workout"),
+            Badge("workouts_5", "High Five", "5", "Completed 5 workouts", unlockConditionText = "Log 5 workouts"),
+            Badge("workouts_10", "Ten Strong", "10", "Completed 10 workouts", unlockConditionText = "Log 10 workouts"),
+            Badge("workouts_30", "Iron Habit", "30", "Completed 30 workouts", unlockConditionText = "Log 30 workouts"),
+            Badge("streak_3", "Three-Day Spark", "3", "Built a 3-day streak", unlockConditionText = "Work out 3 days in a row"),
+            Badge("streak_7", "Weekly Warrior", "7", "Built a 7-day streak", unlockConditionText = "Work out 7 days in a row"),
+            Badge("streak_14", "Fortnight Fire", "14", "Built a 14-day streak", unlockConditionText = "Work out 14 days in a row"),
+            Badge("streak_30", "Monthly Machine", "30", "Built a 30-day streak", unlockConditionText = "Work out 30 days in a row"),
+            Badge("momentum_peak", "Peak Momentum", "PK", "Reached 85 momentum", unlockConditionText = "Raise momentum to 85"),
+            Badge("leg_day_respect", "Leg Day Respect", "LG", "Logged legs twice in a row", unlockConditionText = "Log two leg workouts in a row"),
+            Badge("early_bird", "Early Bird", "AM", "Logged a workout before 8 AM", unlockConditionText = "Finish a workout before 8 AM"),
+            Badge("recovery_smart", "Recovery Smart", "RS", "Logged a recovery day", unlockConditionText = "Use Life Happened once")
+        ).map { badge ->
             badge.copy(isUnlocked = unlockedMap[badge.id] == true)
         }
     }

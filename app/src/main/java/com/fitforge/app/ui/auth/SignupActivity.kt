@@ -6,17 +6,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fitforge.app.data.models.User
 import com.fitforge.app.data.repository.AuthRepository
+import com.fitforge.app.data.repository.UserRepository
 import com.fitforge.app.databinding.ActivitySignupBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import android.content.Intent
 import com.fitforge.app.ui.onboarding.OnboardingActivity
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 
 class SignupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignupBinding
     private val authRepository = AuthRepository()
+    private val userRepository = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +51,25 @@ class SignupActivity : AppCompatActivity() {
                 if (result.isSuccess) {
                     val uid = FirebaseAuth.getInstance().currentUser?.uid
                     if (uid != null) {
-                        val user = User(uid = uid, displayName = name, email = email)
-                        FirebaseFirestore.getInstance().collection("users").document(uid).set(user)
+                        val user = User(
+                            uid = uid,
+                            displayName = name,
+                            email = email,
+                            createdAt = Timestamp.now(),
+                            lastActiveAt = Timestamp.now(),
+                            badges = defaultBadgeMap()
+                        )
+                        val profileResult = userRepository.createUserProfile(user)
+                        if (profileResult.isFailure) {
+                            binding.btnSignup.isEnabled = true
+                            binding.btnSignup.text = "SIGN UP"
+                            Toast.makeText(
+                                this@SignupActivity,
+                                profileResult.exceptionOrNull()?.localizedMessage ?: "Failed to create profile",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@launch
+                        }
                     }
                     Toast.makeText(this@SignupActivity, "Account created!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this@SignupActivity, OnboardingActivity::class.java)
@@ -64,5 +83,22 @@ class SignupActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun defaultBadgeMap(): Map<String, Boolean> {
+        return listOf(
+            "first_workout",
+            "workouts_5",
+            "workouts_10",
+            "workouts_30",
+            "streak_3",
+            "streak_7",
+            "streak_14",
+            "streak_30",
+            "momentum_peak",
+            "leg_day_respect",
+            "early_bird",
+            "recovery_smart"
+        ).associateWith { false }
     }
 }

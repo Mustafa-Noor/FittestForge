@@ -25,9 +25,9 @@ class BadgeAdapter(private val onBadgeClick: (Badge) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(badge: Badge) {
-            binding.tvBadgeEmoji.text = if (badge.isUnlocked) badge.emoji else "🔒"
+            binding.tvBadgeEmoji.text = if (badge.isUnlocked) badge.emoji else "LOCK"
             binding.tvBadgeName.text = if (badge.isUnlocked) badge.name else "Locked"
-            
+
             if (badge.isUnlocked) {
                 binding.badgeImageContainer.setBackgroundResource(R.drawable.bg_badge_unlocked)
                 binding.tvBadgeName.setTextColor(binding.root.context.getColor(R.color.text_primary))
