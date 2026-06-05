@@ -52,12 +52,16 @@ class HomeFragment : Fragment() {
             binding.tvMomentumValue.text = "${momentum.value.toInt()}%"
             binding.tvMomentumLabel.text = momentum.label
             
-            // Update the horizontal progress bar (momentumFill)
             val params = binding.momentumFill.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
             params.matchConstraintPercentWidth = if (momentum.value > 0) momentum.value / 100f else 0.01f
             binding.momentumFill.layoutParams = params
 
             binding.tvStatStreak.text = "🔥 ${momentum.streak}"
+            binding.tvTopStreak.text = momentum.streak.toString()
+            
+            binding.layoutStreakTop.setOnClickListener {
+                StreakOverlayDialog.newInstance(momentum.streak).show(childFragmentManager, "StreakOverlay")
+            }
         }
 
         viewModel.homeMessage.observe(viewLifecycleOwner) { message ->

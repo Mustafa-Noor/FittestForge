@@ -11,8 +11,8 @@ data class Workout(
     val notes: String = "",
     val isRecoveryDay: Boolean = false,
     val recoveryReason: String? = null,
-    val exercises: List<WorkoutExercise> = emptyList(),
-    val deleted: Boolean = false
+    val deleted: Boolean = false,
+    val exercises: List<WorkoutExercise> = emptyList()
 )
 
 data class WorkoutExercise(

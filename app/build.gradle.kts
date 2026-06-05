@@ -102,7 +102,7 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // ── Lottie Animations ─────────────────────────────────
-    implementation("com.airbnb.android:lottie:6.6.2")
+    implementation("com.airbnb.android:lottie:6.7.1")
 
     // ── Coroutines ────────────────────────────────────────
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
@@ -131,6 +131,9 @@ dependencies {
 
     // ── Shimmer ───────────────────────────────────────────
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    // ── WorkManager ───────────────────────────────────────
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     // ── Test ──────────────────────────────────────────────
     testImplementation("junit:junit:4.13.2")

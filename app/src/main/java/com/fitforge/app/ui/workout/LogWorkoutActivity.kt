@@ -2,14 +2,15 @@ package com.fitforge.app.ui.workout
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fitforge.app.data.models.WorkoutExercise
 import com.fitforge.app.data.models.WorkoutSet
 import com.fitforge.app.databinding.ActivityLogWorkoutBinding
+
+import androidx.activity.viewModels
+import com.fitforge.app.ui.workout.LogWorkoutViewModel
 
 class LogWorkoutActivity : AppCompatActivity() {
 
@@ -26,12 +27,13 @@ class LogWorkoutActivity : AppCompatActivity() {
 
         startTimeMillis = System.currentTimeMillis()
         setupRecyclerView()
-        addExerciseFromIntentIfPresent()
+        setupObservers()
 
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.btnAddExercise.setOnClickListener {
-            addBlankExercise()
+            // For now, keep dummy but in a real app this would open ExerciseLibrary
+            addDummyExercise()
         }
 
         binding.btnLifeHappened.setOnClickListener {
@@ -39,37 +41,29 @@ class LogWorkoutActivity : AppCompatActivity() {
         }
 
         binding.btnFinishWorkout.setOnClickListener {
+            val notes = binding.etNotes.text.toString()
             if (exerciseList.isEmpty()) {
                 Toast.makeText(this, "Add at least one exercise", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            if (exerciseList.any { it.exerciseName.isBlank() }) {
-                Toast.makeText(this, "Add a name for each exercise", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            binding.progressBar.visibility = View.VISIBLE
             binding.btnFinishWorkout.isEnabled = false
-            viewModel.saveWorkout(exerciseList, binding.etNotes.text.toString(), startTimeMillis)
+            viewModel.saveWorkout(exerciseList, notes, startTimeMillis)
         }
+    }
 
+    private fun setupObservers() {
         viewModel.saveResult.observe(this) { result ->
-            binding.progressBar.visibility = View.GONE
             binding.btnFinishWorkout.isEnabled = true
-            
-            result.onSuccess { saveResult ->
+            if (result.success) {
                 val intent = Intent(this, WorkoutCompleteActivity::class.java).apply {
-                    putStringArrayListExtra("new_badges", ArrayList(saveResult.newBadges))
-                    putExtra("new_momentum", saveResult.newMomentum)
-                    putExtra("new_streak", saveResult.newStreak)
-                    putExtra("workout_duration", saveResult.durationMinutes)
-                    putExtra("total_sets", saveResult.totalSets)
+                    putExtra("NEW_MOMENTUM", result.newMomentum)
+                    putExtra("NEW_STREAK", result.newStreak)
+                    putStringArrayListExtra("NEW_BADGES", ArrayList(result.newBadges))
                 }
                 startActivity(intent)
                 finish()
-            }.onFailure { e ->
-                Toast.makeText(this, "Failed to save: ${e.message}", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "Error: ${result.error}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -85,39 +79,18 @@ class LogWorkoutActivity : AppCompatActivity() {
             onRemoveExercise = { pos ->
                 exerciseList.removeAt(pos)
                 adapter.notifyItemRemoved(pos)
-                adapter.notifyItemRangeChanged(pos, exerciseList.size - pos)
             }
         )
         binding.rvWorkoutSets.layoutManager = LinearLayoutManager(this)
         binding.rvWorkoutSets.adapter = adapter
     }
 
-    private fun addExerciseFromIntentIfPresent() {
-        val exerciseName = intent.getStringExtra("EXERCISE_NAME") ?: return
-        addExercise(
-            WorkoutExercise(
-                exerciseId = intent.getStringExtra("EXERCISE_ID").orEmpty(),
-                exerciseName = exerciseName,
-                muscleGroup = intent.getStringExtra("MUSCLE_GROUP").orEmpty(),
-                sets = listOf(WorkoutSet())
-            )
+    private fun addDummyExercise() {
+        val dummy = WorkoutExercise(
+            exerciseName = "Exercise ${exerciseList.size + 1}",
+            sets = listOf(WorkoutSet())
         )
-    }
-
-    private fun addBlankExercise() {
-        addExercise(
-            WorkoutExercise(
-                exerciseName = "",
-                sets = listOf(WorkoutSet())
-            )
-        )
-    }
-
-    private fun addExercise(exercise: WorkoutExercise) {
-        exerciseList.add(exercise)
+        exerciseList.add(dummy)
         adapter.notifyItemInserted(exerciseList.size - 1)
-        binding.rvWorkoutSets.post {
-            binding.rvWorkoutSets.smoothScrollToPosition(exerciseList.lastIndex)
-        }
     }
 }

@@ -8,6 +8,7 @@ import com.fitforge.app.data.models.MomentumData
 import com.fitforge.app.data.models.PersonalityMode
 import com.fitforge.app.data.repository.UserRepository
 import com.fitforge.app.data.repository.WorkoutRepository
+import com.fitforge.app.utils.MomentumCalculator
 import com.fitforge.app.utils.PersonalityStrings
 import kotlinx.coroutines.launch
 
@@ -60,23 +61,33 @@ class HomeViewModel : ViewModel() {
             val workouts = workoutResult.getOrDefault(emptyList())
             _recentWorkouts.value = workouts
 
-            // Momentum logic based on real data or default for new users
-            val currentMomentumValue = user?.momentum ?: 0f
-            
-            val momentumLabel = when {
-                currentMomentumValue >= 80 -> "Elite Momentum"
-                currentMomentumValue >= 60 -> "Strong Momentum"
-                currentMomentumValue >= 40 -> "Building Up"
-                currentMomentumValue > 0 -> "Getting Started"
-                else -> "New Journey"
+            // Momentum logic with decay on open
+            var currentMomentumValue = user?.momentum ?: 0f
+            if (user != null && user.momentumUpdatedAt.isNotEmpty()) {
+                val decayedMomentum = MomentumCalculator.calculateDecayOnOpen(
+                    storedMomentum = user.momentum,
+                    lastWorkoutDate = user.lastWorkoutDate,
+                    momentumUpdatedAt = user.momentumUpdatedAt
+                )
+                
+                if (decayedMomentum != user.momentum) {
+                    currentMomentumValue = decayedMomentum
+                    // Update Firestore silently
+                    userRepository.updateProfileFields(mapOf(
+                        "momentum" to currentMomentumValue,
+                        "momentumUpdatedAt" to java.time.LocalDate.now().toString()
+                    ))
+                }
             }
+            
+            val momentumLabel = MomentumCalculator.getMomentumLabel(currentMomentumValue)
 
             val currentMomentum = MomentumData(
                 value = currentMomentumValue, 
                 label = momentumLabel, 
                 colorRes = android.R.color.holo_blue_dark, 
                 streak = user?.currentStreak ?: 0,
-                lastUpdated = ""
+                lastUpdated = user?.momentumUpdatedAt ?: ""
             )
             _momentumData.value = currentMomentum
 

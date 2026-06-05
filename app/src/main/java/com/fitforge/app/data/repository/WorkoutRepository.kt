@@ -6,67 +6,48 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
-import java.time.LocalDate
 
 class WorkoutRepository {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    private fun getWorkoutCollection() =
-        db.collection("users").document(auth.currentUser?.uid ?: throw Exception("User not authenticated")).collection("workouts")
+    private fun getUserId() = auth.currentUser?.uid ?: throw Exception("User not authenticated")
 
-    private fun getUserDocument() =
-        db.collection("users").document(auth.currentUser?.uid ?: throw Exception("User not authenticated"))
+    private fun getWorkoutCollection() =
+        db.collection("users").document(getUserId()).collection("workouts")
+
+    private fun getUserDocument() = db.collection("users").document(getUserId())
 
     suspend fun saveWorkoutAndUpdateStats(workout: Workout): Result<String> {
         return try {
             val workoutRef = getWorkoutCollection().document()
-            val normalizedExercises = workout.exercises.map { exercise ->
-                exercise.copy(
-                    sets = exercise.sets.mapIndexed { index, set ->
-                        set.copy(setNumber = index + 1)
-                    }
-                )
-            }
-            val workoutWithId = workout.copy(id = workoutRef.id, exercises = normalizedExercises)
-            
+            val workoutId = workoutRef.id
+            val finalWorkout = workout.copy(id = workoutId)
+
             val batch = db.batch()
-            batch.set(workoutRef, workoutWithId)
+
+            // 1. Write workout document
+            batch.set(workoutRef, finalWorkout)
+
+            // 2. Update user stats
+            val userUpdates = mutableMapOf<String, Any>(
+                "totalMinutes" to FieldValue.increment(workout.durationMinutes.toLong()),
+                "lastActiveAt" to FieldValue.serverTimestamp()
+            )
 
             if (!workout.isRecoveryDay) {
-                val userUpdates = mutableMapOf<String, Any>(
-                    "totalWorkouts" to FieldValue.increment(1),
-                    "totalMinutes" to FieldValue.increment(workout.durationMinutes.toLong()),
-                    "lastWorkoutDate" to workout.dateString,
-                    "lastActiveAt" to FieldValue.serverTimestamp()
-                )
+                userUpdates["totalWorkouts"] = FieldValue.increment(1)
+                userUpdates["lastWorkoutDate"] = workout.dateString
+                
                 if (workout.exercises.isNotEmpty()) {
                     userUpdates["lastMuscleGroup"] = workout.exercises.last().muscleGroup
                 }
-                batch.update(getUserDocument(), userUpdates)
-            } else {
-                batch.update(getUserDocument(), mapOf(
-                    "totalMinutes" to FieldValue.increment(workout.durationMinutes.toLong()),
-                    "lastActiveAt" to FieldValue.serverTimestamp()
-                ))
             }
 
-            batch.commit().await()
-            Result.success(workoutRef.id)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+            batch.update(getUserDocument(), userUpdates)
 
-    suspend fun getWorkouts(): Result<List<Workout>> {
-        return try {
-            val snapshot = getWorkoutCollection()
-                .whereEqualTo("deleted", false)
-                .orderBy("date", Query.Direction.DESCENDING)
-                .get()
-                .await()
-            val workouts = snapshot.toObjects(Workout::class.java)
-            Result.success(workouts)
+            batch.commit().await()
+            Result.success(workoutId)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -78,11 +59,9 @@ class WorkoutRepository {
                 .whereEqualTo("deleted", false)
                 .whereGreaterThanOrEqualTo("dateString", startDate)
                 .whereLessThanOrEqualTo("dateString", endDate)
-                .orderBy("dateString", Query.Direction.DESCENDING)
                 .get()
                 .await()
-            val workouts = snapshot.toObjects(Workout::class.java)
-            Result.success(workouts)
+            Result.success(snapshot.toObjects(Workout::class.java))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -94,15 +73,14 @@ class WorkoutRepository {
                 .whereEqualTo("deleted", false)
                 .get()
                 .await()
+            
             val workouts = snapshot.toObjects(Workout::class.java)
-            val counts = workouts
-                .filter { !it.isRecoveryDay }
+            val muscleGroupCounts = workouts
                 .flatMap { it.exercises }
-                .map { it.muscleGroup.trim() }
-                .filter { it.isNotBlank() }
-                .groupBy { it }
-                .mapValues { it.value.size }
-            Result.success(counts)
+                .groupingBy { it.muscleGroup }
+                .eachCount()
+            
+            Result.success(muscleGroupCounts)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -110,7 +88,9 @@ class WorkoutRepository {
 
     suspend fun deleteWorkout(workoutId: String): Result<Unit> {
         return try {
-            getWorkoutCollection().document(workoutId).update("deleted", true).await()
+            getWorkoutCollection().document(workoutId)
+                .update("deleted", true)
+                .await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -119,16 +99,15 @@ class WorkoutRepository {
 
     suspend fun getWorkoutsForProgress(limitDays: Int): Result<List<Workout>> {
         return try {
-            val startDate = LocalDate.now().minusDays(limitDays.toLong()).toString()
+            // Fetch recent workouts, excluding recovery and deleted
             val snapshot = getWorkoutCollection()
                 .whereEqualTo("deleted", false)
                 .whereEqualTo("isRecoveryDay", false)
-                .whereGreaterThanOrEqualTo("dateString", startDate)
-                .orderBy("dateString", Query.Direction.DESCENDING)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(limitDays.toLong())
                 .get()
                 .await()
-            val workouts = snapshot.toObjects(Workout::class.java)
-            Result.success(workouts)
+            Result.success(snapshot.toObjects(Workout::class.java))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -140,6 +119,20 @@ class WorkoutRepository {
                 .whereEqualTo("deleted", false)
                 .orderBy("date", Query.Direction.DESCENDING)
                 .limit(limit)
+                .get()
+                .await()
+            val workouts = snapshot.toObjects(Workout::class.java)
+            Result.success(workouts)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getWorkouts(): Result<List<Workout>> {
+        return try {
+            val snapshot = getWorkoutCollection()
+                .whereEqualTo("deleted", false)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .await()
             val workouts = snapshot.toObjects(Workout::class.java)

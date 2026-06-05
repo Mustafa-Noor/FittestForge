@@ -47,16 +47,32 @@
             app:layout_constraintStart_toStartOf="@id/tvGreeting"
             app:layout_constraintTop_toBottomOf="@id/tvGreeting" />
 
-        <ImageView
-            android:id="@+id/ivNotification"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="Notifications"
-            android:src="@drawable/ic_check"
+        <LinearLayout
+            android:id="@+id/layoutStreakTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_bottom_sheet"
+            android:backgroundTint="@color/bg_secondary"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="@id/ivProfile"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/ivProfile"
-            app:tint="@color/text_primary" />
+            app:layout_constraintTop_toTopOf="@id/ivProfile">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔥 "
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tvTopStreak"
+                style="@style/TextStyle.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/primary"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <!-- B. Momentum Card -->
         <com.google.android.material.card.MaterialCardView

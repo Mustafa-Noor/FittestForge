@@ -5,48 +5,88 @@ import com.fitforge.app.data.models.Workout
 import java.util.Calendar
 
 object BadgeChecker {
+
     fun checkAndUnlock(user: User, allWorkouts: List<Workout>): List<String> {
-        val newBadgeIds = mutableListOf<String>()
+        val newlyUnlocked = mutableListOf<String>()
         val existingBadges = user.badges
 
-        val badgeConditions = mapOf(
-            "first_workout" to { allWorkouts.count { !it.isRecoveryDay } >= 1 },
-            "workouts_5" to { allWorkouts.count { !it.isRecoveryDay } >= 5 },
-            "workouts_10" to { allWorkouts.count { !it.isRecoveryDay } >= 10 },
-            "workouts_30" to { allWorkouts.count { !it.isRecoveryDay } >= 30 },
-            "streak_3" to { user.currentStreak >= 3 },
-            "streak_7" to { user.currentStreak >= 7 },
-            "streak_14" to { user.currentStreak >= 14 },
-            "streak_30" to { user.currentStreak >= 30 },
-            "momentum_peak" to { user.momentum >= 85f },
-            "leg_day_respect" to {
-                val nonRecovery = allWorkouts.filter { !it.isRecoveryDay }
-                    .sortedByDescending { it.date?.toDate() }
-                if (nonRecovery.size >= 2) {
-                    val last2 = nonRecovery.take(2)
-                    last2.all { workout ->
-                        workout.exercises.any { it.muscleGroup.lowercase() == "legs" }
-                    }
-                } else false
-            },
-            "early_bird" to {
-                val lastWorkout = allWorkouts.filter { !it.isRecoveryDay }
-                    .maxByOrNull { it.date?.toDate()?.time ?: 0L }
-                lastWorkout?.date?.let { timestamp ->
-                    val cal = Calendar.getInstance()
-                    cal.time = timestamp.toDate()
-                    cal.get(Calendar.HOUR_OF_DAY) < 8
-                } ?: false
-            },
-            "recovery_smart" to { allWorkouts.any { it.isRecoveryDay } }
-        )
+        val nonRecoveryWorkouts = allWorkouts.filter { !it.isRecoveryDay && !it.deleted }
+        val workoutCount = nonRecoveryWorkouts.size
 
-        for ((badgeId, condition) in badgeConditions) {
-            if (existingBadges[badgeId] != true && condition()) {
-                newBadgeIds.add(badgeId)
+        // 1. first_workout
+        if (existingBadges["first_workout"] != true) {
+            if (workoutCount >= 1) newlyUnlocked.add("first_workout")
+        }
+
+        // 2. workouts_5
+        if (existingBadges["workouts_5"] != true) {
+            if (workoutCount >= 5) newlyUnlocked.add("workouts_5")
+        }
+
+        // 3. workouts_10
+        if (existingBadges["workouts_10"] != true) {
+            if (workoutCount >= 10) newlyUnlocked.add("workouts_10")
+        }
+
+        // 4. workouts_30
+        if (existingBadges["workouts_30"] != true) {
+            if (workoutCount >= 30) newlyUnlocked.add("workouts_30")
+        }
+
+        // 5. streak_3
+        if (existingBadges["streak_3"] != true) {
+            if (user.currentStreak >= 3) newlyUnlocked.add("streak_3")
+        }
+
+        // 6. streak_7
+        if (existingBadges["streak_7"] != true) {
+            if (user.currentStreak >= 7) newlyUnlocked.add("streak_7")
+        }
+
+        // 7. streak_14
+        if (existingBadges["streak_14"] != true) {
+            if (user.currentStreak >= 14) newlyUnlocked.add("streak_14")
+        }
+
+        // 8. streak_30
+        if (existingBadges["streak_30"] != true) {
+            if (user.currentStreak >= 30) newlyUnlocked.add("streak_30")
+        }
+
+        // 9. momentum_peak
+        if (existingBadges["momentum_peak"] != true) {
+            if (user.momentum >= 85f) newlyUnlocked.add("momentum_peak")
+        }
+
+        // 10. leg_day_respect
+        if (existingBadges["leg_day_respect"] != true) {
+            if (nonRecoveryWorkouts.size >= 2) {
+                val lastTwo = nonRecoveryWorkouts.take(2)
+                val bothHaveLegs = lastTwo.all { workout ->
+                    workout.exercises.any { it.muscleGroup.lowercase() == "legs" }
+                }
+                if (bothHaveLegs) newlyUnlocked.add("leg_day_respect")
             }
         }
 
-        return newBadgeIds
+        // 11. early_bird
+        if (existingBadges["early_bird"] != true) {
+            nonRecoveryWorkouts.firstOrNull()?.date?.let { timestamp ->
+                val cal = Calendar.getInstance()
+                cal.time = timestamp.toDate()
+                if (cal.get(Calendar.HOUR_OF_DAY) < 8) {
+                    newlyUnlocked.add("early_bird")
+                }
+            }
+        }
+
+        // 12. recovery_smart
+        if (existingBadges["recovery_smart"] != true) {
+            if (allWorkouts.any { it.isRecoveryDay && !it.deleted }) {
+                newlyUnlocked.add("recovery_smart")
+            }
+        }
+
+        return newlyUnlocked
     }
 }
