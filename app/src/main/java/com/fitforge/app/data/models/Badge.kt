@@ -5,5 +5,6 @@ data class Badge(
     val name: String = "",
     val emoji: String = "",
     val description: String = "",
-    val isUnlocked: Boolean = false
+    val isUnlocked: Boolean = false,
+    val unlockConditionText: String = ""
 )

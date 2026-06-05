@@ -18,6 +18,12 @@ class WorkoutViewModel : ViewModel() {
     private val _exercises = MutableLiveData<List<Exercise>>()
     val exercises: LiveData<List<Exercise>> = _exercises
 
+    private val _isExerciseLoading = MutableLiveData(false)
+    val isExerciseLoading: LiveData<Boolean> = _isExerciseLoading
+
+    private val _exerciseError = MutableLiveData<String?>()
+    val exerciseError: LiveData<String?> = _exerciseError
+
     private val _history = MutableLiveData<List<Workout>>()
     val history: LiveData<List<Workout>> = _history
 
@@ -28,10 +34,19 @@ class WorkoutViewModel : ViewModel() {
 
     private fun loadExercises() {
         viewModelScope.launch {
+            _isExerciseLoading.value = true
+            _exerciseError.value = null
+
             val result = exerciseRepository.getExercises(limit = 20)
             if (result.isSuccess) {
                 _exercises.value = result.getOrDefault(emptyList())
+            } else {
+                _exercises.value = emptyList()
+                _exerciseError.value = result.exceptionOrNull()?.localizedMessage
+                    ?: "Unable to load exercises."
             }
+
+            _isExerciseLoading.value = false
         }
     }
 

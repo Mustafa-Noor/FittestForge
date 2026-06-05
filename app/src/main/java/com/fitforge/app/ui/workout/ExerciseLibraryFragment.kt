@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import android.content.Intent
+import android.widget.Toast
 import com.fitforge.app.adapters.ExerciseAdapter
 import com.fitforge.app.databinding.FragmentExerciseLibraryBinding
-import com.fitforge.app.ui.workout.ExerciseDetailActivity
 
 class ExerciseLibraryFragment : Fragment() {
 
@@ -31,19 +31,27 @@ class ExerciseLibraryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         adapter = ExerciseAdapter { exercise ->
-            val intent = Intent(requireContext(), ExerciseDetailActivity::class.java)
+            val intent = Intent(requireContext(), LogWorkoutActivity::class.java)
             intent.putExtra("EXERCISE_ID", exercise.id)
+            intent.putExtra("EXERCISE_NAME", exercise.name)
+            intent.putExtra("MUSCLE_GROUP", exercise.bodyPart)
             startActivity(intent)
         }
         binding.rvExercises.adapter = adapter
 
         viewModel.exercises.observe(viewLifecycleOwner) { exercises ->
             adapter.submitList(exercises)
-            binding.progressBar.visibility = View.GONE
         }
-        
-        if (viewModel.exercises.value == null) {
-            binding.progressBar.visibility = View.VISIBLE
+
+        viewModel.isExerciseLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.rvExercises.visibility = if (isLoading) View.GONE else View.VISIBLE
+        }
+
+        viewModel.exerciseError.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            }
         }
     }
 

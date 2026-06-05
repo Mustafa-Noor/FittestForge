@@ -47,4 +47,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="1. Lie on bench\n2. Lower the bar\n3. Press up" />
 
+    <Button
+        android:id="@+id/btnAddToWorkout"
+        style="@style/Btn.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="ADD TO WORKOUT"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

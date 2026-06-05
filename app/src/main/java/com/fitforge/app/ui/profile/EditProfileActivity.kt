@@ -51,21 +51,20 @@ class EditProfileActivity : AppCompatActivity() {
         val weight = binding.etWeight.text.toString().toFloatOrNull() ?: 0f
         val height = binding.etHeight.text.toString().toFloatOrNull() ?: 0f
 
+        val updates = mapOf(
+            "displayName" to name,
+            "age" to age,
+            "gender" to gender,
+            "weight" to weight,
+            "height" to height
+        )
+
         lifecycleScope.launch {
-            userRepository.getUserProfile().onSuccess { currentUser ->
-                currentUser?.let {
-                    val updatedUser = it.copy(
-                        displayName = name,
-                        age = age,
-                        gender = gender,
-                        weight = weight,
-                        height = height
-                    )
-                    userRepository.updateUserProfile(updatedUser).onSuccess {
-                        Toast.makeText(this@EditProfileActivity, "Profile updated!", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }
-                }
+            userRepository.updateProfileFields(updates).onSuccess {
+                Toast.makeText(this@EditProfileActivity, "Profile updated!", Toast.LENGTH_SHORT).show()
+                finish()
+            }.onFailure { e ->
+                Toast.makeText(this@EditProfileActivity, "Failed to update profile: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }

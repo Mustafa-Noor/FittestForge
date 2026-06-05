@@ -23,7 +23,7 @@
             android:text="AI Message"
             android:maxWidth="280dp" />
 
-        <com.airbnb.android.lottie.LottieAnimationView
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/typingIndicator"
             android:layout_width="40dp"
             android:layout_height="20dp"

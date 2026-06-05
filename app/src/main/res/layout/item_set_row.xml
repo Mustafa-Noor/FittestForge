@@ -4,44 +4,58 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingVertical="4dp">
+    android:paddingVertical="6dp">
 
     <TextView
         android:id="@+id/tvSetNumber"
         style="@style/TextStyle.Body"
-        android:layout_width="32dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="1"
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etWeight"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
         android:layout_weight="1"
+        android:background="@drawable/bg_set_input"
         android:hint="kg"
         android:inputType="numberDecimal"
+        android:paddingHorizontal="8dp"
+        android:singleLine="true"
         android:textAlignment="center" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:text="×" />
 
     <EditText
         android:id="@+id/etReps"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
         android:layout_weight="1"
+        android:background="@drawable/bg_set_input"
         android:hint="reps"
         android:inputType="number"
+        android:paddingHorizontal="8dp"
+        android:singleLine="true"
         android:textAlignment="center" />
 
     <CheckBox
         android:id="@+id/cbDone"
-        android:layout_width="wrap_content"
+        android:layout_width="48dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp" />
+        android:layout_marginStart="8dp"
+        android:gravity="center" />
+
+    <ImageView
+        android:id="@+id/btnRemoveSet"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Remove set"
+        android:padding="10dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:tint="@color/error" />
 
 </LinearLayout>

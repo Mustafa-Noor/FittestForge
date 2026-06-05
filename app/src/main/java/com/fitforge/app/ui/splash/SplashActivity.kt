@@ -9,14 +9,19 @@ import android.os.Handler
 import android.os.Looper
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.fitforge.app.MainActivity
 import com.fitforge.app.databinding.ActivitySplashBinding
+import com.fitforge.app.data.repository.UserRepository
 import com.fitforge.app.ui.auth.LoginActivity
+import com.fitforge.app.utils.MomentumCalculator
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
+    private val userRepository = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,13 +56,40 @@ class SplashActivity : AppCompatActivity() {
         }, 1200)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            if (currentUser != null) {
-                startActivity(Intent(this, MainActivity::class.java))
-            } else {
-                startActivity(Intent(this, LoginActivity::class.java))
-            }
-            finish()
+            checkAuthAndNavigate()
         }, 2200)
+    }
+
+    private fun checkAuthAndNavigate() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            lifecycleScope.launch {
+                try {
+                    val user = userRepository.getUserStats().getOrNull()
+                    if (user != null) {
+                        val decayed = MomentumCalculator.calculateDecayOnOpen(
+                            user.momentum, 
+                            user.lastWorkoutDate, 
+                            user.momentumUpdatedAt
+                        )
+                        if (decayed != user.momentum) {
+                            userRepository.updateMomentumAndStreak(
+                                decayed, 
+                                user.currentStreak, 
+                                user.bestStreak, 
+                                user.lastWorkoutDate
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Silently fail and continue navigation
+                }
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                finish()
+            }
+        } else {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
     }
 }

@@ -9,6 +9,7 @@
     <!-- ── Accent / Secondary ─────────────────────── -->
     <color name="accent">#7C3AED</color>           <!-- Violet/Indigo -->
     <color name="accent_light">#EDE9FE</color>
+    <color name="secondary">#7C3AED</color>        <!-- Alias for accent -->
 
     <!-- ── Success / Positive ─────────────────────── -->
     <color name="success">#10B981</color>          <!-- Emerald Green -->

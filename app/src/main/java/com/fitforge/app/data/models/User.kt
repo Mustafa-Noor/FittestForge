@@ -16,6 +16,7 @@ data class User(
     val createdAt: Timestamp? = null,
     val lastActiveAt: Timestamp? = null,
     val momentum: Float = 50f,
+    val momentumUpdatedAt: String = "",
     val currentStreak: Int = 0,
     val bestStreak: Int = 0,
     val totalWorkouts: Int = 0,
@@ -23,5 +24,6 @@ data class User(
     val lastWorkoutDate: String = "",
     val lastMuscleGroup: String = "",
     val fcmToken: String = "",
-    val badges: Map<String, Boolean> = emptyMap()
+    val badges: Map<String, Boolean> = emptyMap(),
+    val badgeUnlockedAt: Map<String, Timestamp> = emptyMap()
 )
