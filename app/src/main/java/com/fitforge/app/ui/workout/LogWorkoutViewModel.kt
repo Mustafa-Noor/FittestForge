@@ -29,7 +29,8 @@ class LogWorkoutViewModel : ViewModel() {
         val newBadges: List<String> = emptyList(),
         val newMomentum: Float = 0f,
         val newStreak: Int = 0,
-        val error: String? = null
+        val error: String? = null,
+        val personalityMode: String = "hype"
     )
 
     fun saveWorkout(exercises: List<WorkoutExercise>, notes: String, startTimeMillis: Long) {
@@ -51,11 +52,17 @@ class LogWorkoutViewModel : ViewModel() {
                 )
 
                 // 1. Save workout and update base stats
-                workoutRepository.saveWorkoutAndUpdateStats(workout).onSuccess {
-                    
+                val saveResult = workoutRepository.saveWorkoutAndUpdateStats(workout)
+                if (saveResult.isSuccess) {
                     // 2. Fetch updated user to check badges and momentum
-                    val user = userRepository.getUserProfile().getOrNull() ?: return@onSuccess
-                    val allWorkouts = workoutRepository.getWorkouts().getOrNull() ?: emptyList()
+                    val userResult = userRepository.getUserProfile()
+                    val user = userResult.getOrNull()
+                    if (user == null) {
+                        _saveResult.value = SaveResult(success = false, error = "Failed to fetch user profile")
+                        return@launch
+                    }
+                    val workoutsResult = workoutRepository.getWorkouts()
+                    val allWorkouts = workoutsResult.getOrNull() ?: emptyList()
 
                     // 3. Check for new badges
                     val newlyUnlocked = BadgeChecker.checkAndUnlock(user, allWorkouts)
@@ -103,10 +110,79 @@ class LogWorkoutViewModel : ViewModel() {
                         success = true,
                         newBadges = newlyUnlocked,
                         newMomentum = newMomentum,
-                        newStreak = newStreak
+                        newStreak = newStreak,
+                        personalityMode = user.personalityMode
                     )
-                }.onFailure {
-                    _saveResult.value = SaveResult(success = false, error = it.message)
+                } else {
+                    _saveResult.value = SaveResult(success = false, error = saveResult.exceptionOrNull()?.message)
+                }
+            } catch (e: Exception) {
+                _saveResult.value = SaveResult(success = false, error = e.message)
+            }
+        }
+    }
+
+    fun logRecovery(reason: String) {
+        viewModelScope.launch {
+            try {
+                val today = LocalDate.now()
+                val todayString = today.format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+                val workout = Workout(
+                    date = Timestamp.now(),
+                    dateString = todayString,
+                    durationMinutes = 0,
+                    totalSets = 0,
+                    notes = "Recovery day: $reason",
+                    isRecoveryDay = true,
+                    recoveryReason = reason,
+                    exercises = emptyList()
+                )
+
+                // 1. Save workout (recovery day)
+                val saveResult = workoutRepository.saveWorkoutAndUpdateStats(workout)
+                if (saveResult.isSuccess) {
+                    // 2. Fetch updated user to check momentum and badges
+                    val userResult = userRepository.getUserProfile()
+                    val user = userResult.getOrNull()
+                    if (user == null) {
+                        _saveResult.value = SaveResult(success = false, error = "Failed to fetch user profile")
+                        return@launch
+                    }
+                    val workoutsResult = workoutRepository.getWorkouts()
+                    val allWorkouts = workoutsResult.getOrNull() ?: emptyList()
+
+                    // 3. Check for new badges (recovery_smart unlocks here)
+                    val newlyUnlocked = BadgeChecker.checkAndUnlock(user, allWorkouts)
+                    newlyUnlocked.forEach { badgeId ->
+                        userRepository.unlockBadge(badgeId)
+                    }
+
+                    // 4. Calculate Momentum
+                    val newMomentum = MomentumCalculator.calculateNewMomentum(
+                        currentValue = user.momentum,
+                        daysMissed = 0,
+                        workoutCompleted = false,
+                        lifeHappened = true
+                    )
+
+                    // 5. Update user with new momentum and streak
+                    userRepository.updateMomentumAndStreak(
+                        newMomentum = newMomentum,
+                        newStreak = user.currentStreak, // Streak does NOT increment/change on recovery day
+                        bestStreak = user.bestStreak,
+                        lastWorkoutDate = user.lastWorkoutDate // Last workout date remains unchanged
+                    )
+
+                    _saveResult.value = SaveResult(
+                        success = true,
+                        newBadges = newlyUnlocked,
+                        newMomentum = newMomentum,
+                        newStreak = user.currentStreak,
+                        personalityMode = user.personalityMode
+                    )
+                } else {
+                    _saveResult.value = SaveResult(success = false, error = saveResult.exceptionOrNull()?.message)
                 }
             } catch (e: Exception) {
                 _saveResult.value = SaveResult(success = false, error = e.message)

@@ -36,12 +36,15 @@
         <activity android:name=".ui.auth.ForgotPasswordActivity" android:exported="false" />
         
         <!-- Onboarding -->
+        <activity android:name=".ui.onboarding.SetupProfileActivity" android:exported="false" />
         <activity android:name=".ui.onboarding.OnboardingActivity" android:exported="false" />
 
         <!-- Workout Flow -->
+        <activity android:name=".ui.workout.ExerciseCategoryListActivity" android:exported="false" />
         <activity android:name=".ui.workout.LogWorkoutActivity" android:exported="false" />
         <activity android:name=".ui.workout.ExerciseDetailActivity" android:exported="false" />
         <activity android:name=".ui.workout.WorkoutCompleteActivity" android:exported="false" />
+        <activity android:name=".ui.workout.WorkoutHistoryActivity" android:exported="false" />
 
         <!-- Profile Flow -->
         <activity android:name=".ui.profile.EditProfileActivity" android:exported="false" />

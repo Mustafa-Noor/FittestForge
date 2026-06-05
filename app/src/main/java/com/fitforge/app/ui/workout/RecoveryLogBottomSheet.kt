@@ -6,7 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import com.fitforge.app.data.local.PrefsManager
+import com.fitforge.app.data.models.PersonalityMode
 import com.fitforge.app.databinding.DialogRecoveryLogBinding
+import com.fitforge.app.utils.PersonalityStrings
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class RecoveryLogBottomSheet : BottomSheetDialogFragment() {
@@ -41,12 +44,16 @@ class RecoveryLogBottomSheet : BottomSheetDialogFragment() {
         }
 
         viewModel.saveResult.observe(viewLifecycleOwner) { result ->
-            result.onSuccess {
-                Toast.makeText(context, "Day Protected! Stay safe.", Toast.LENGTH_SHORT).show()
+            if (result.success) {
+                val prefs = PrefsManager(requireContext())
+                val modeString = prefs.personalityMode
+                val mode = PersonalityMode.values().find { it.value == modeString } ?: PersonalityMode.HYPE
+                val message = PersonalityStrings.getRecoveryLogMessage(mode)
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 dismiss()
-            }.onFailure { e ->
+            } else {
                 binding.btnProtectDay.isEnabled = true
-                Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Failed: ${result.error}", Toast.LENGTH_SHORT).show()
             }
         }
     }

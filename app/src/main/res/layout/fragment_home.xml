@@ -74,6 +74,20 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/ivCalendar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_check"
+            app:tint="@color/primary"
+            android:padding="6dp"
+            android:background="@drawable/bg_bottom_sheet"
+            android:backgroundTint="@color/bg_secondary"
+            app:layout_constraintBottom_toBottomOf="@id/ivProfile"
+            app:layout_constraintEnd_toStartOf="@id/layoutStreakTop"
+            app:layout_constraintTop_toTopOf="@id/ivProfile" />
+
         <!-- B. Momentum Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMomentum"

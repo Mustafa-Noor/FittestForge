@@ -4,14 +4,19 @@ import com.fitforge.app.data.models.Exercise
 
 object ExerciseData {
     
+    data class ExerciseCategory(
+        val name: String,
+        val imageUrl: String
+    )
+
     val categories = listOf(
-        "Full Body",
-        "Chest",
-        "Back",
-        "Legs",
-        "Shoulders",
-        "Arms",
-        "Abs"
+        ExerciseCategory("Full Body", "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80"),
+        ExerciseCategory("Chest", "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80"),
+        ExerciseCategory("Back", "https://images.unsplash.com/photo-1603287681836-b174ce5074c2?w=800&q=80"),
+        ExerciseCategory("Legs", "https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=800&q=80"),
+        ExerciseCategory("Shoulders", "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&q=80"),
+        ExerciseCategory("Arms", "https://images.unsplash.com/photo-1581009137042-c552e485697a?w=800&q=80"),
+        ExerciseCategory("Abs", "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80")
     )
 
     val exercises = listOf(

@@ -11,6 +11,7 @@ import com.fitforge.app.databinding.ActivitySignupBinding
 import kotlinx.coroutines.launch
 import android.content.Intent
 import com.fitforge.app.ui.onboarding.OnboardingActivity
+import com.fitforge.app.ui.onboarding.SetupProfileActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 
@@ -72,7 +73,7 @@ class SignupActivity : AppCompatActivity() {
                         }
                     }
                     Toast.makeText(this@SignupActivity, "Account created!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@SignupActivity, OnboardingActivity::class.java)
+                    val intent = Intent(this@SignupActivity, SetupProfileActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()

@@ -98,18 +98,20 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilGender"
-                    style="@style/Input.Default"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
+                    app:boxStrokeColor="@color/primary"
+                    app:hintTextColor="@color/primary"
                     android:hint="Gender">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <AutoCompleteTextView
                         android:id="@+id/etGender"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="text" />
+                        android:inputType="none" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 

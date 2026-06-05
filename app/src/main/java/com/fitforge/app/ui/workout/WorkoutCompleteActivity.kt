@@ -33,7 +33,7 @@ class WorkoutCompleteActivity : AppCompatActivity() {
         binding.tvMotivationalQuote.text = quotes[Random.nextInt(quotes.size)]
 
         binding.btnBackToHome.setOnClickListener {
-            val intent = Intent(this, com.fitforge.app.ui.home.MainActivity::class.java)
+            val intent = Intent(this, com.fitforge.app.MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()

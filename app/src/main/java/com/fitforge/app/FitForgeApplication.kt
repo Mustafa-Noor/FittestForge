@@ -1,6 +1,7 @@
 package com.fitforge.app
 
 import android.app.Application
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
@@ -13,17 +14,6 @@ class FitForgeApplication : Application() {
         FirebaseApp.initializeApp(this)
         FitForgeAudioManager.init(this)
         createNotificationChannels()
-        scheduleNotifications()
-    }
-
-    private fun scheduleNotifications() {
-        val workRequest = androidx.work.PeriodicWorkRequestBuilder<com.fitforge.app.workers.FitNotificationWorker>(24, java.util.concurrent.TimeUnit.HOURS)
-            .build()
-        androidx.work.WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "daily_reminder",
-            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
-        )
     }
 
     private fun createNotificationChannels() {

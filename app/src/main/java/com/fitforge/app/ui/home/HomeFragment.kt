@@ -74,6 +74,11 @@ class HomeFragment : Fragment() {
                 binding.rvRecentWorkouts.visibility = View.GONE
                 binding.tvRecentTitle.text = "No Workouts Yet"
                 binding.btnViewAll.visibility = View.GONE
+                
+                binding.tvPlanTitle.text = "Ready to move?"
+                binding.tvPlanMessage.text = "Your couch is starting to recognize your body shape 💀"
+                binding.btnStartWorkoutHome.text = "START"
+                binding.btnStartWorkoutHome.isEnabled = true
             } else {
                 binding.rvRecentWorkouts.visibility = View.VISIBLE
                 binding.tvRecentTitle.text = "Recent Workouts"
@@ -84,12 +89,34 @@ class HomeFragment : Fragment() {
                 }
                 binding.rvRecentWorkouts.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
                 binding.rvRecentWorkouts.adapter = adapter
-                adapter.submitList(workouts)
+                adapter.submitList(workouts.take(3)) // Only show top 3 in home
+
+                val todayDateString = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                if (workouts.any { it.dateString == todayDateString }) {
+                    binding.tvPlanTitle.text = "Great Job Today!"
+                    binding.tvPlanMessage.text = "You've already crushed your workout. Rest up for tomorrow! 💪"
+                    binding.btnStartWorkoutHome.text = "DONE"
+                    binding.btnStartWorkoutHome.isEnabled = false
+                } else {
+                    binding.tvPlanTitle.text = "Ready to move?"
+                    binding.tvPlanMessage.text = "Time to get after it! Let's build that streak! 🔥"
+                    binding.btnStartWorkoutHome.text = "START"
+                    binding.btnStartWorkoutHome.isEnabled = true
+                }
             }
         }
 
         binding.btnStartWorkoutHome.setOnClickListener {
             startActivity(Intent(requireContext(), LogWorkoutActivity::class.java))
+        }
+
+        binding.btnViewAll.setOnClickListener {
+            startActivity(Intent(requireContext(), com.fitforge.app.ui.workout.WorkoutHistoryActivity::class.java))
+        }
+
+        binding.ivCalendar.setOnClickListener {
+            val dates = viewModel.recentWorkouts.value?.map { it.dateString } ?: emptyList()
+            CalendarDialog(dates).show(childFragmentManager, "CalendarDialog")
         }
 
         // For demo/testing: set date

@@ -25,7 +25,7 @@ class BadgeAdapter(private val onBadgeClick: (Badge) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(badge: Badge) {
-            binding.tvBadgeEmoji.text = if (badge.isUnlocked) badge.emoji else "LOCK"
+            binding.tvBadgeEmoji.text = if (badge.isUnlocked) badge.emoji else "🔒"
             binding.tvBadgeName.text = if (badge.isUnlocked) badge.name else "Locked"
 
             if (badge.isUnlocked) {

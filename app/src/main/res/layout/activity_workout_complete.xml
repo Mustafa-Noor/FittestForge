@@ -41,7 +41,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="\"The only bad workout is the one that didn't happen.\"" />
+        tools:text="&quot;The only bad workout is the one that didn't happen.&quot;" />
 
     <LinearLayout
         android:id="@+id/statsContainer"

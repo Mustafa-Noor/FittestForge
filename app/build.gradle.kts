@@ -98,8 +98,7 @@ dependencies {
 
     // ── Image Loading ─────────────────────────────────────
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    implementation("com.google.firebase:firebase-firestore:26.3.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // ── Lottie Animations ─────────────────────────────────
     implementation("com.airbnb.android:lottie:6.7.1")
@@ -134,6 +133,9 @@ dependencies {
 
     // ── WorkManager ───────────────────────────────────────
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // ── Calendar ──────────────────────────────────────────
+    implementation("com.kizitonwose.calendar:view:2.4.1")
 
     // ── Test ──────────────────────────────────────────────
     testImplementation("junit:junit:4.13.2")

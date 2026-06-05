@@ -1,16 +1,40 @@
 package com.fitforge.app.ui.profile
 
+import android.app.Activity
+import android.net.Uri
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.fitforge.app.data.repository.UserRepository
 import com.fitforge.app.databinding.ActivityEditProfileBinding
+import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.launch
 
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditProfileBinding
     private val userRepository = UserRepository()
+
+    private val startForProfileImageResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val resultCode = result.resultCode
+            val data = result.data
+
+            if (resultCode == Activity.RESULT_OK) {
+                val fileUri = data?.data!!
+                binding.ivProfileLarge.setImageURI(fileUri)
+                uploadImageToFirebase(fileUri)
+            } else if (resultCode == ImagePicker.RESULT_ERROR) {
+                Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,11 +45,29 @@ class EditProfileActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
+        // Setup Gender Dropdown
+        val genders = arrayOf("Male", "Female")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, genders)
+        binding.etGender.setAdapter(adapter)
+
         loadUserData()
 
         binding.btnSaveProfile.setOnClickListener {
             saveUserData()
         }
+
+        binding.btnChangePhoto.setOnClickListener { openImagePicker() }
+        binding.ivProfileLarge.setOnClickListener { openImagePicker() }
+    }
+
+    private fun openImagePicker() {
+        ImagePicker.with(this)
+            .cropSquare()
+            .compress(1024)
+            .maxResultSize(1080, 1080)
+            .createIntent { intent ->
+                startForProfileImageResult.launch(intent)
+            }
     }
 
     private fun loadUserData() {
@@ -34,13 +76,39 @@ class EditProfileActivity : AppCompatActivity() {
                 user?.let {
                     binding.etName.setText(it.displayName)
                     binding.etAge.setText(it.age.toString())
-                    binding.etGender.setText(it.gender)
+                    // For AutoCompleteTextView, setText(text, false) is needed to avoid dropdown popping up
+                    binding.etGender.setText(it.gender, false)
                     binding.etWeight.setText(it.weight.toString())
                     binding.etHeight.setText(it.height.toString())
+
+                    if (it.photoUrl.isNotEmpty()) {
+                        Glide.with(this@EditProfileActivity)
+                            .load(it.photoUrl)
+                            .into(binding.ivProfileLarge)
+                    }
                 }
             }.onFailure {
                 Toast.makeText(this@EditProfileActivity, "Error loading profile", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun uploadImageToFirebase(fileUri: Uri) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$uid.jpg")
+
+        Toast.makeText(this, "Uploading image...", Toast.LENGTH_SHORT).show()
+        
+        storageRef.putFile(fileUri).addOnSuccessListener {
+            storageRef.downloadUrl.addOnSuccessListener { uri ->
+                val downloadUrl = uri.toString()
+                lifecycleScope.launch {
+                    userRepository.updateProfileFields(mapOf("photoUrl" to downloadUrl))
+                    Toast.makeText(this@EditProfileActivity, "Profile image updated!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
         }
     }
 

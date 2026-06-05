@@ -23,7 +23,6 @@ data class User(
     val totalMinutes: Int = 0,
     val lastWorkoutDate: String = "",
     val lastMuscleGroup: String = "",
-    val momentumUpdatedAt: String = "",
     val fcmToken: String = "",
     val badges: Map<String, Boolean> = emptyMap(),
     val badgeUnlockedAt: Map<String, Timestamp> = emptyMap()
