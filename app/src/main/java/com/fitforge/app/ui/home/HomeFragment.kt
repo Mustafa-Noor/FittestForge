@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.fitforge.app.databinding.FragmentHomeBinding
 import com.fitforge.app.ui.workout.LogWorkoutActivity
 
@@ -107,7 +108,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.btnStartWorkoutHome.setOnClickListener {
-            startActivity(Intent(requireContext(), LogWorkoutActivity::class.java))
+            findNavController().navigate(com.fitforge.app.R.id.nav_workout)
         }
 
         binding.btnViewAll.setOnClickListener {

@@ -183,10 +183,7 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:layout_width="150dp"
-                android:layout_height="150dp"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true"
-                app:lottie_url="https://lottie.host/809a80e1-4547-41ab-8e0c-2fc8c66e4a2c/60H65s785y.json" />
+                android:layout_height="150dp" />
 
             <TextView
                 android:id="@+id/tvBmiResult"

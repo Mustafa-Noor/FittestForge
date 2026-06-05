@@ -21,9 +21,9 @@ class OnboardingActivity : AppCompatActivity() {
         prefsManager = PrefsManager(this)
 
         val pages = listOf(
-            OnboardingPage("No more dead streaks", "Miss a day. Lose 15%. Not everything. Your momentum builds over time, not resets overnight.", 0),
-            OnboardingPage("Pick your personality", "Hype Man. Drill Sergeant. Chill Coach. Chaos Goblin. Your app talks how you want it to.", 0),
-            OnboardingPage("Rest days aren't failures", "Sick? Exams? Travel? Log it. We protect your streak. We respect your life.", 0)
+            OnboardingPage("No more dead streaks", "Miss a day. Lose 15%. Not everything. Your momentum builds over time, not resets overnight.", "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80"),
+            OnboardingPage("Pick your personality", "Hype Man. Drill Sergeant. Chill Coach. Chaos Goblin. Your app talks how you want it to.", "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&q=80"),
+            OnboardingPage("Rest days aren't failures", "Sick? Exams? Travel? Log it. We protect your streak. We respect your life.", "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80")
         )
 
         val adapter = OnboardingAdapter(pages)
