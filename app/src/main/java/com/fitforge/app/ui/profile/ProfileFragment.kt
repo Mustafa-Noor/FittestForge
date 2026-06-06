@@ -100,7 +100,14 @@ class ProfileFragment : Fragment() {
                     binding.tvName.text = it.displayName
                     binding.tvEmail.text = it.email
                     highlightSelectedPersonality(it.personalityMode)
-                    if (it.photoUrl.isNotEmpty()) {
+                    val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                    val localImage = prefs.getString("local_profile_image", null)
+                    
+                    if (localImage != null) {
+                        com.bumptech.glide.Glide.with(this@ProfileFragment)
+                            .load(android.net.Uri.parse(localImage))
+                            .into(binding.ivProfile)
+                    } else if (it.photoUrl.isNotEmpty()) {
                         com.bumptech.glide.Glide.with(this@ProfileFragment)
                             .load(it.photoUrl)
                             .into(binding.ivProfile)
@@ -164,18 +171,12 @@ class ProfileFragment : Fragment() {
         }
 
     private fun uploadImageToFirebase(fileUri: android.net.Uri) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val storageRef = com.google.firebase.storage.FirebaseStorage.getInstance().reference.child("profile_images/$uid.jpg")
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit().putString("local_profile_image", fileUri.toString()).apply()
+        android.widget.Toast.makeText(requireContext(), "Profile image updated locally!", android.widget.Toast.LENGTH_SHORT).show()
         
-        storageRef.putFile(fileUri).addOnSuccessListener {
-            storageRef.downloadUrl.addOnSuccessListener { uri ->
-                val downloadUrl = uri.toString()
-                lifecycleScope.launch {
-                    userRepository.updateProfileFields(mapOf("photoUrl" to downloadUrl))
-                }
-            }
-        }.addOnFailureListener {
-            android.widget.Toast.makeText(requireContext(), "Failed to upload image", android.widget.Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            userRepository.updateProfileFields(mapOf("photoUrl" to fileUri.toString()))
         }
     }
 

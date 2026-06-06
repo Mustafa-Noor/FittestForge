@@ -14,7 +14,18 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Workout Calendar"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvMonthName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:text="Month Year"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"

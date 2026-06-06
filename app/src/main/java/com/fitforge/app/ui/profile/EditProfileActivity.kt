@@ -81,7 +81,14 @@ class EditProfileActivity : AppCompatActivity() {
                     binding.etWeight.setText(it.weight.toString())
                     binding.etHeight.setText(it.height.toString())
 
-                    if (it.photoUrl.isNotEmpty()) {
+                    val prefs = getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                    val localImage = prefs.getString("local_profile_image", null)
+                    
+                    if (localImage != null) {
+                        Glide.with(this@EditProfileActivity)
+                            .load(android.net.Uri.parse(localImage))
+                            .into(binding.ivProfileLarge)
+                    } else if (it.photoUrl.isNotEmpty()) {
                         Glide.with(this@EditProfileActivity)
                             .load(it.photoUrl)
                             .into(binding.ivProfileLarge)
@@ -94,21 +101,12 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebase(fileUri: Uri) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$uid.jpg")
-
-        Toast.makeText(this, "Uploading image...", Toast.LENGTH_SHORT).show()
+        val prefs = getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit().putString("local_profile_image", fileUri.toString()).apply()
+        Toast.makeText(this, "Profile image updated locally!", Toast.LENGTH_SHORT).show()
         
-        storageRef.putFile(fileUri).addOnSuccessListener {
-            storageRef.downloadUrl.addOnSuccessListener { uri ->
-                val downloadUrl = uri.toString()
-                lifecycleScope.launch {
-                    userRepository.updateProfileFields(mapOf("photoUrl" to downloadUrl))
-                    Toast.makeText(this@EditProfileActivity, "Profile image updated!", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.addOnFailureListener {
-            Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            userRepository.updateProfileFields(mapOf("photoUrl" to fileUri.toString()))
         }
     }
 

@@ -36,6 +36,11 @@ class CalendarDialog(private val workoutDates: List<String>) : DialogFragment() 
 
         binding.calendarView.setup(startMonth, endMonth, firstDayOfWeek)
         binding.calendarView.scrollToMonth(currentMonth)
+        
+        binding.calendarView.monthScrollListener = { month ->
+            val formatter = java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy")
+            binding.tvMonthName.text = formatter.format(month.yearMonth)
+        }
 
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)

@@ -38,13 +38,17 @@ class HomeFragment : Fragment() {
         viewModel.userName.observe(viewLifecycleOwner) { name ->
             binding.tvGreeting.text = "Welcome Back, $name 👋"
         }
+        
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val localImage = prefs.getString("local_profile_image", null)
+        if (localImage != null) {
+            com.bumptech.glide.Glide.with(this)
+                .load(android.net.Uri.parse(localImage))
+                .into(binding.ivProfile)
+        }
 
         viewModel.totalWorkouts.observe(viewLifecycleOwner) { total ->
             binding.tvStatWorkouts.text = total.toString()
-        }
-
-        viewModel.totalHours.observe(viewLifecycleOwner) { hours ->
-            binding.tvStatHours.text = hours
         }
 
         viewModel.momentumData.observe(viewLifecycleOwner) { momentum ->
@@ -57,7 +61,7 @@ class HomeFragment : Fragment() {
             params.matchConstraintPercentWidth = if (momentum.value > 0) momentum.value / 100f else 0.01f
             binding.momentumFill.layoutParams = params
 
-            binding.tvStatStreak.text = "🔥 ${momentum.streak}"
+            binding.tvStatStreak.text = momentum.streak.toString()
             binding.tvTopStreak.text = momentum.streak.toString()
             
             binding.layoutStreakTop.setOnClickListener {

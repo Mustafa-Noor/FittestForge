@@ -30,7 +30,7 @@ class AICoachViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash",
+        modelName = "gemini-flash-latest",
         apiKey = BuildConfig.GEMINI_API_KEY
     )
 
