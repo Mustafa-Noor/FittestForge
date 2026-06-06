@@ -91,9 +91,13 @@ class HomeViewModel : ViewModel() {
             )
             _momentumData.value = currentMomentum
 
+            val currentStreak = user?.currentStreak ?: 0
+            val totalWorkouts = user?.totalWorkouts ?: 0
             _homeMessage.value = when {
-                workouts.isEmpty() -> "Welcome to FitForge! Start your first workout to build momentum. ✨"
-                currentMomentumValue > 50 -> PersonalityStrings.getMomentumHighMessage(mode)
+                workouts.isEmpty() -> "Welcome to FitForge! Your first workout is waiting. Let's build something amazing ✨"
+                currentStreak >= 3 -> PersonalityStrings.getStreakMessage(mode, currentStreak, totalWorkouts)
+                currentMomentumValue > 60 -> PersonalityStrings.getMomentumHighMessage(mode)
+                currentMomentumValue < 35 -> PersonalityStrings.getMissedDayMessage(mode)
                 else -> PersonalityStrings.getMomentumLowMessage(mode)
             }
         }

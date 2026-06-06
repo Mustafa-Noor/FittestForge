@@ -25,10 +25,10 @@
         <!-- A. Top Bar Profile Info -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivProfile"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="48dp"
+            android:layout_marginTop="20dp"
             android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -401,6 +401,7 @@
             tools:listitem="@layout/item_workout_history" />
 
         <!-- F. Daily Tip -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardDailyTip"
             style="@style/Card.Default"

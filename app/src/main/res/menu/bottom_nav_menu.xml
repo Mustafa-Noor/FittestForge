@@ -17,6 +17,10 @@
         android:icon="@drawable/ic_ai"
         android:title="AI Coach" />
     <item
+        android:id="@+id/nav_food_intake"
+        android:icon="@drawable/ic_check"
+        android:title="Nutrition" />
+    <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_profile"
         android:title="Profile" />

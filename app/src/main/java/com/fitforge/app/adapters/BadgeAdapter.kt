@@ -1,5 +1,7 @@
 package com.fitforge.app.adapters
 
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -25,15 +27,24 @@ class BadgeAdapter(private val onBadgeClick: (Badge) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(badge: Badge) {
-            binding.tvBadgeEmoji.text = if (badge.isUnlocked) badge.emoji else "🔒"
-            binding.tvBadgeName.text = if (badge.isUnlocked) badge.name else "Locked"
+            // Always show the real badge emoji — locked ones shown at 35% opacity
+            binding.tvBadgeEmoji.text = badge.emoji
+            binding.tvBadgeName.text = badge.name
 
             if (badge.isUnlocked) {
+                // Fully unlocked — vivid colored background
                 binding.badgeImageContainer.setBackgroundResource(R.drawable.bg_badge_unlocked)
                 binding.tvBadgeName.setTextColor(binding.root.context.getColor(R.color.text_primary))
+                // Clear any grayscale filter
+                binding.tvBadgeEmoji.alpha = 1f
+                binding.badgeImageContainer.alpha = 1f
             } else {
+                // Locked — show at low opacity, desaturated
                 binding.badgeImageContainer.setBackgroundResource(R.drawable.bg_badge_locked)
                 binding.tvBadgeName.setTextColor(binding.root.context.getColor(R.color.text_secondary))
+                // Apply grayscale + low opacity to the emoji
+                binding.tvBadgeEmoji.alpha = 0.35f
+                binding.badgeImageContainer.alpha = 0.5f
             }
 
             binding.root.setOnClickListener { onBadgeClick(badge) }

@@ -49,6 +49,15 @@
         <!-- Profile Flow -->
         <activity android:name=".ui.profile.EditProfileActivity" android:exported="false" />
         <activity android:name=".ui.profile.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.profile.BadgeListActivity" android:exported="false" />
+
+        <!-- Food Intake Flow -->
+        <activity android:name=".ui.food.FoodIntakeDetailActivity" android:exported="false" />
+        <activity android:name=".ui.food.FoodResultActivity" android:exported="false" />
+
+        <!-- Challenges Flow -->
+        <activity android:name=".ui.workout.ChallengesActivity" android:exported="false" />
+        <activity android:name=".ui.workout.ChallengeDetailActivity" android:exported="false" />
 
         <!-- Receiver for Notifications -->
         <receiver android:name=".notifications.RoastReceiver" android:exported="false" />

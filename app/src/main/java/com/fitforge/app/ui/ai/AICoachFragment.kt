@@ -66,6 +66,11 @@ class AICoachFragment : Fragment() {
         binding.chip3.setOnClickListener { viewModel.sendMessage(binding.chip3.text.toString()) }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshContext()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -1,11 +1,18 @@
 package com.fitforge.app.ui.workout
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import com.fitforge.app.R
 import com.fitforge.app.databinding.FragmentWorkoutBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -38,6 +45,16 @@ class WorkoutFragment : Fragment() {
                 else -> null
             }
         }.attach()
+
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_challenges -> {
+                    startActivity(Intent(requireContext(), ChallengesActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private inner class WorkoutPagerAdapter(fragment: Fragment) :

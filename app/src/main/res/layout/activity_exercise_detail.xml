@@ -137,14 +137,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:layout_marginTop="8dp">
+
+                        <ImageButton
+                            android:id="@+id/btnTimerMinus"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_minus"
+                            app:tint="@color/primary" />
 
                         <Button
                             android:id="@+id/btnStartTimer"
                             style="@style/Btn.Secondary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginHorizontal="8dp"
                             android:text="Start" />
 
                         <Button
@@ -154,6 +163,15 @@
                             android:layout_height="wrap_content"
                             android:text="Stop"
                             android:textColor="@color/error" />
+
+                        <ImageButton
+                            android:id="@+id/btnTimerPlus"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_add"
+                            app:tint="@color/primary" />
+                    </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

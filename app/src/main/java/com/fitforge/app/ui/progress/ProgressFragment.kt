@@ -87,18 +87,25 @@ class ProgressFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.momentumData.observe(viewLifecycleOwner) { points ->
-            val hasData = points.isNotEmpty()
-            binding.momentumLineChart.visibility = if (hasData) View.VISIBLE else View.GONE
-            binding.tvMomentumEmpty.visibility = if (hasData) View.GONE else View.VISIBLE
-            if (!hasData) {
+            if (points.isEmpty()) {
+                binding.momentumLineChart.visibility = View.GONE
+                binding.tvMomentumEmpty.visibility = View.VISIBLE
                 binding.momentumLineChart.clear()
                 return@observe
             }
 
-            val entries = points.mapIndexed { index, point ->
+            binding.momentumLineChart.visibility = View.VISIBLE
+            binding.tvMomentumEmpty.visibility = View.GONE
+
+            // Always add a zero-baseline start point if only 1 entry, so chart renders
+            val chartPoints = if (points.size == 1) {
+                listOf(com.fitforge.app.ui.progress.MomentumPoint("Start", 0f)) + points
+            } else points
+
+            val entries = chartPoints.mapIndexed { index, point ->
                 Entry(index.toFloat(), point.value)
             }
-            val dataSet = LineDataSet(entries, "Logged Sets").apply {
+            val dataSet = LineDataSet(entries, "Activity").apply {
                 color = resources.getColor(R.color.primary, null)
                 setCircleColor(resources.getColor(R.color.primary, null))
                 lineWidth = 3f
@@ -111,7 +118,11 @@ class ProgressFragment : Fragment() {
             }
             binding.momentumLineChart.data = LineData(dataSet)
             binding.momentumLineChart.xAxis.valueFormatter =
-                IndexAxisValueFormatter(points.map { it.date.takeLast(5) })
+                IndexAxisValueFormatter(chartPoints.map { it.date.takeLast(5) })
+            // Fix axis bounds so data is always visible
+            binding.momentumLineChart.axisLeft.axisMinimum = 0f
+            binding.momentumLineChart.axisLeft.axisMaximum = (chartPoints.maxOf { it.value } * 1.3f).coerceAtLeast(10f)
+            binding.momentumLineChart.setBackgroundColor(android.graphics.Color.TRANSPARENT)
             binding.momentumLineChart.invalidate()
         }
 

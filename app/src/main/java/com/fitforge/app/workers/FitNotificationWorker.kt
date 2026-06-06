@@ -12,43 +12,50 @@ import androidx.work.WorkerParameters
 import com.fitforge.app.R
 import com.fitforge.app.ui.splash.SplashActivity
 import com.fitforge.app.data.repository.UserRepository
-import kotlinx.coroutines.tasks.await
-import kotlin.random.Random
+import java.time.LocalDate
 
 class FitNotificationWorker(
     private val context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
-    private val messages = listOf(
-        "Your streak is in danger! Don't let your gains disappear.",
-        "Your couch misses you, but your muscles miss you more. Time to lift!",
-        "Even 10 minutes counts. Keep the momentum going!",
-        "Did you forget about us? Log a workout now to save your streak."
-    )
-
     override suspend fun doWork(): Result {
         return try {
             val repo = UserRepository()
-            val userOpt = repo.getUserProfile()
-            
-            // Just assume if we successfully wake up, we should notify
-            // Duolingo style: "These reminders don't seem to be working. We'll stop sending them for now."
-            val streak = userOpt.getOrNull()?.currentStreak ?: 0
-            val message = if (streak > 0) {
-                "You have a $streak day streak! Don't lose it now 🔥"
-            } else {
-                messages[Random.nextInt(messages.size)]
+            val user = repo.getUserProfile().getOrNull()
+
+            val name = user?.displayName?.split(" ")?.firstOrNull() ?: "Champion"
+            val streak = user?.currentStreak ?: 0
+            val totalWorkouts = user?.totalWorkouts ?: 0
+            val lastWorkoutDate = user?.lastWorkoutDate ?: ""
+            val goal = user?.fitnessGoal ?: ""
+
+            val daysSinceWorkout = if (lastWorkoutDate.isNotEmpty()) {
+                try {
+                    val last = LocalDate.parse(lastWorkoutDate)
+                    java.time.temporal.ChronoUnit.DAYS.between(last, LocalDate.now()).toInt()
+                } catch (e: Exception) { -1 }
+            } else -1
+
+            val message = when {
+                streak >= 7 -> "$name, you're on a $streak day streak! 🔥 You're an absolute machine. Keep it going!"
+                streak > 0 && daysSinceWorkout == 0 -> "Great work today, $name! $streak days strong. See you tomorrow 💪"
+                streak > 0 -> "$name, protect your $streak day streak! Don't let today be the day it breaks 🔥"
+                daysSinceWorkout > 3 -> "Hey $name, it's been $daysSinceWorkout days. Your $totalWorkouts workout record deserves more chapters!"
+                totalWorkouts == 0 -> "Welcome, $name! Your first workout is waiting. Start small — even 10 minutes counts 🏋️"
+                goal.contains("lose", ignoreCase = true) -> "$name, every workout burns calories. Your goal is within reach — log a session now!"
+                goal.contains("gain", ignoreCase = true) -> "$name, muscles grow when you show up. Time to add another session to your $totalWorkouts total!"
+                else -> "$name, consistency beats intensity. Log a workout today to keep your momentum alive 💪"
             }
 
-            showNotification(message)
+            showNotification(name, message)
             Result.success()
         } catch (e: Exception) {
             Result.failure()
         }
     }
 
-    private fun showNotification(message: String) {
+    private fun showNotification(name: String, message: String) {
         val channelId = "fitforge_daily_reminders"
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -72,8 +79,9 @@ class FitNotificationWorker(
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_workout)
-            .setContentTitle("FitForge")
+            .setContentTitle("Hey $name! 💪 FitForge")
             .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

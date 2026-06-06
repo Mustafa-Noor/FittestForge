@@ -31,6 +31,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- Account Section -->
             <TextView
                 style="@style/TextStyle.Title"
                 android:layout_width="wrap_content"
@@ -50,23 +51,7 @@
                     android:orientation="vertical">
 
                     <com.google.android.material.button.MaterialButton
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="start|center_vertical"
-                        android:padding="16dp"
-                        android:text="Change Email"
-                        android:textAllCaps="false"
-                        android:textColor="@color/text_primary"
-                        app:icon="@drawable/ic_check"
-                        app:iconTint="@color/text_secondary" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/divider" />
-
-                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChangePassword"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -75,11 +60,57 @@
                         android:text="Change Password"
                         android:textAllCaps="false"
                         android:textColor="@color/text_primary"
-                        app:icon="@drawable/ic_check"
+                        app:icon="@drawable/ic_lock"
                         app:iconTint="@color/text_secondary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Coach Section -->
+            <TextView
+                style="@style/TextStyle.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="AI Coach"
+                android:textColor="@color/primary" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Card.Default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCoachPersonality"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="16dp"
+                        android:text="Coach Personality"
+                        android:textAllCaps="false"
+                        android:textColor="@color/text_primary"
+                        app:icon="@drawable/ic_ai"
+                        app:iconTint="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/tvCurrentPersonality"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="56dp"
+                        android:paddingBottom="12dp"
+                        android:text="Hype"
+                        android:textColor="@color/primary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Preferences Section -->
             <TextView
                 style="@style/TextStyle.Title"
                 android:layout_width="wrap_content"
@@ -107,17 +138,10 @@
                         android:checked="true"
                         android:text="Push Notifications"
                         style="@style/TextStyle.Body" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchDarkMode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Dark Mode"
-                        style="@style/TextStyle.Body" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- About Section -->
             <TextView
                 style="@style/TextStyle.Title"
                 android:layout_width="wrap_content"
@@ -139,17 +163,53 @@
                     android:padding="16dp">
 
                     <TextView
+                        style="@style/TextStyle.Heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="FittestForge" />
+
+                    <TextView
                         style="@style/TextStyle.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
                         android:text="Version 1.0.0" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="@color/divider" />
+
+                    <TextView
+                        style="@style/TextStyle.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Developers" />
 
                     <TextView
                         style="@style/TextStyle.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="FitForge © 2024" />
+                        android:text="Talha Minister"
+                        android:textColor="@color/primary" />
+
+                    <TextView
+                        style="@style/TextStyle.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Mustafa Musk"
+                        android:textColor="@color/primary" />
+
+                    <TextView
+                        style="@style/TextStyle.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="© 2026 FittestForge. All rights reserved."
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

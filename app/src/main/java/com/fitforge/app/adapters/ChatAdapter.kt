@@ -1,5 +1,8 @@
 package com.fitforge.app.adapters
 
+import android.graphics.Typeface
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +17,22 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         private const val VIEW_TYPE_USER = 1
         private const val VIEW_TYPE_AI = 2
+
+        /** Converts **text** markdown bold into SpannableString bold spans */
+        fun parseMarkdownBold(input: String): CharSequence {
+            val ssb = SpannableStringBuilder()
+            val regex = Regex("""\*\*(.+?)\*\*""")
+            var lastEnd = 0
+            for (match in regex.findAll(input)) {
+                ssb.append(input.substring(lastEnd, match.range.first))
+                val start = ssb.length
+                ssb.append(match.groupValues[1])
+                ssb.setSpan(StyleSpan(Typeface.BOLD), start, ssb.length, 0)
+                lastEnd = match.range.last + 1
+            }
+            ssb.append(input.substring(lastEnd))
+            return ssb
+        }
     }
 
     fun submitList(newMessages: List<ChatMessage>) {
@@ -40,7 +59,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         if (holder is UserViewHolder) {
             holder.binding.tvMessage.text = message.text
         } else if (holder is AiViewHolder) {
-            holder.binding.tvMessage.text = message.text
+            holder.binding.tvMessage.text = parseMarkdownBold(message.text)
         }
     }
 

@@ -35,4 +35,10 @@
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 
+    <fragment
+        android:id="@+id/nav_food_intake"
+        android:name="com.fitforge.app.ui.food.FoodIntakeFragment"
+        android:label="Nutrition"
+        tools:layout="@layout/fragment_food_intake" />
+
 </navigation>
