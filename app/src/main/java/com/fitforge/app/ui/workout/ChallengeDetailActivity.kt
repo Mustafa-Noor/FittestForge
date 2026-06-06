@@ -44,15 +44,20 @@ class ChallengeDetailActivity : AppCompatActivity() {
         }
 
         val completedDays = prefs.getStringSet("completed_days", emptySet()) ?: emptySet()
-        val today = LocalDate.now()
-        val daysSinceStart = java.time.temporal.ChronoUnit.DAYS.between(startDate, today).toInt() + 1
-        val currentDay = daysSinceStart.coerceIn(1, challenge.durationDays)
+        val lastCompletedDateStr = prefs.getString("last_completed_date", null)
+        val today = LocalDate.now().toString()
+        val isLastCompletedToday = lastCompletedDateStr == today
+
+        val currentDay = if (isLastCompletedToday) {
+            completedDays.size // They cannot start the next day yet
+        } else {
+            completedDays.size + 1 // They can start the next day
+        }.coerceIn(1, challenge.durationDays)
 
         val adapter = ChallengeDayAdapter(challenge.days, currentDay, completedDays) { day ->
             if (!day.isRestDay) {
-                // Mark day as started — open LogWorkoutActivity
-                val intent = Intent(this, LogWorkoutActivity::class.java)
-                intent.putExtra("challenge_day_focus", day.focus)
+                // Launch the new Guided Workout list
+                val intent = Intent(this, ChallengeDayWorkoutActivity::class.java)
                 intent.putExtra("challenge_id", challengeId)
                 intent.putExtra("challenge_day_number", day.dayNumber)
                 startActivity(intent)
@@ -60,7 +65,10 @@ class ChallengeDetailActivity : AppCompatActivity() {
                 // Mark rest day as complete
                 val newCompleted = completedDays.toMutableSet()
                 newCompleted.add(day.dayNumber.toString())
-                prefs.edit().putStringSet("completed_days", newCompleted).apply()
+                prefs.edit()
+                    .putStringSet("completed_days", newCompleted)
+                    .putString("last_completed_date", today)
+                    .apply()
                 recreate()
             }
         }

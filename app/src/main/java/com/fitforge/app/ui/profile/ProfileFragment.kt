@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.fitforge.app.data.repository.UserRepository
 import com.fitforge.app.databinding.FragmentProfileBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -34,6 +35,10 @@ class ProfileFragment : Fragment() {
 
         binding.btnSeeBadges.setOnClickListener {
             startActivity(Intent(requireContext(), com.fitforge.app.ui.profile.BadgeListActivity::class.java))
+        }
+
+        binding.btnProgress.setOnClickListener {
+            findNavController().navigate(com.fitforge.app.R.id.nav_progress)
         }
 
         binding.btnEditProfile.setOnClickListener {

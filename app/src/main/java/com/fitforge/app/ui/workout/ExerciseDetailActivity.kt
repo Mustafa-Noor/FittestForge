@@ -23,6 +23,7 @@ class ExerciseDetailActivity : AppCompatActivity() {
     private var startTimeMillis: Long = 0
     private var timer: CountDownTimer? = null
     private var timeRemainingSeconds = 60 // default 60s rest
+    private var isTimerRunning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +50,9 @@ class ExerciseDetailActivity : AppCompatActivity() {
         }
 
         adapter = WorkoutSetAdapter(setsList)
+        adapter.onRemoveClick = { position ->
+            adapter.removeSet(position)
+        }
         binding.rvSets.layoutManager = LinearLayoutManager(this)
         binding.rvSets.adapter = adapter
 
@@ -62,6 +66,16 @@ class ExerciseDetailActivity : AppCompatActivity() {
 
         binding.btnStopTimer.setOnClickListener {
             stopTimer()
+        }
+
+        binding.btnTimerMinus.setOnClickListener {
+            timeRemainingSeconds = maxOf(0, timeRemainingSeconds - 10)
+            updateTimerText()
+        }
+
+        binding.btnTimerPlus.setOnClickListener {
+            timeRemainingSeconds += 10
+            updateTimerText()
         }
 
         setupObservers()
@@ -89,13 +103,18 @@ class ExerciseDetailActivity : AppCompatActivity() {
         viewModel.saveResult.observe(this) { result ->
             binding.btnFinishWorkout.isEnabled = true
             if (result.success) {
-                val intent = Intent(this, WorkoutCompleteActivity::class.java).apply {
-                    putExtra("NEW_MOMENTUM", result.newMomentum)
-                    putExtra("NEW_STREAK", result.newStreak)
-                    putStringArrayListExtra("NEW_BADGES", ArrayList(result.newBadges))
+                Toast.makeText(this, "Exercise saved to your workout log! You can go back now.", Toast.LENGTH_LONG).show()
+                binding.btnFinishWorkout.text = "SAVED"
+
+                val isChallengeMode = intent.getBooleanExtra("IS_CHALLENGE_MODE", false)
+                if (isChallengeMode) {
+                    val exerciseId = intent.getStringExtra("EXERCISE_ID")
+                    val resultIntent = Intent().apply {
+                        putExtra("COMPLETED_EXERCISE_ID", exerciseId)
+                    }
+                    setResult(android.app.Activity.RESULT_OK, resultIntent)
+                    finish()
                 }
-                startActivity(intent)
-                finish()
             } else {
                 Toast.makeText(this, "Error: ${result.error}", Toast.LENGTH_LONG).show()
             }
@@ -103,26 +122,42 @@ class ExerciseDetailActivity : AppCompatActivity() {
     }
 
     private fun startTimer() {
-        timer?.cancel()
-        timeRemainingSeconds = 60
-        timer = object : CountDownTimer(60000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeRemainingSeconds = (millisUntilFinished / 1000).toInt()
-                val min = timeRemainingSeconds / 60
-                val sec = timeRemainingSeconds % 60
-                binding.tvTimer.text = String.format("%02d:%02d", min, sec)
-            }
+        if (isTimerRunning) {
+            timer?.cancel()
+            isTimerRunning = false
+            binding.btnStartTimer.text = "Start"
+        } else {
+            timer?.cancel()
+            timer = object : CountDownTimer(timeRemainingSeconds * 1000L, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    timeRemainingSeconds = (millisUntilFinished / 1000).toInt()
+                    updateTimerText()
+                }
 
-            override fun onFinish() {
-                binding.tvTimer.text = "00:00"
-                // Play sound or vibrate
-            }
-        }.start()
+                override fun onFinish() {
+                    timeRemainingSeconds = 0
+                    isTimerRunning = false
+                    binding.btnStartTimer.text = "Start"
+                    updateTimerText()
+                }
+            }.start()
+            isTimerRunning = true
+            binding.btnStartTimer.text = "Pause"
+        }
+    }
+
+    private fun updateTimerText() {
+        val min = timeRemainingSeconds / 60
+        val sec = timeRemainingSeconds % 60
+        binding.tvTimer.text = String.format("%02d:%02d", min, sec)
     }
 
     private fun stopTimer() {
         timer?.cancel()
-        binding.tvTimer.text = "00:00"
+        isTimerRunning = false
+        timeRemainingSeconds = 60
+        binding.btnStartTimer.text = "Start"
+        updateTimerText()
     }
 
     override fun onDestroy() {

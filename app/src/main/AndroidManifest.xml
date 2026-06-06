@@ -58,6 +58,7 @@
         <!-- Challenges Flow -->
         <activity android:name=".ui.workout.ChallengesActivity" android:exported="false" />
         <activity android:name=".ui.workout.ChallengeDetailActivity" android:exported="false" />
+        <activity android:name=".ui.workout.ChallengeDayWorkoutActivity" android:exported="false" />
 
         <!-- Receiver for Notifications -->
         <receiver android:name=".notifications.RoastReceiver" android:exported="false" />

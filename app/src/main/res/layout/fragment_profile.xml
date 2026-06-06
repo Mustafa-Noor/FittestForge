@@ -82,6 +82,15 @@
             android:text="See Your Badges"
             app:layout_constraintTop_toBottomOf="@id/cardProfileHeader" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnProgress"
+            style="@style/Btn.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="View Progress"
+            app:layout_constraintTop_toBottomOf="@id/btnSeeBadges" />
+
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
@@ -100,7 +109,7 @@
             android:layout_marginTop="32dp"
             android:text="Account Settings"
             app:icon="@drawable/ic_check"
-            app:layout_constraintTop_toBottomOf="@id/btnSeeBadges" />
+            app:layout_constraintTop_toBottomOf="@id/btnProgress" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSignOut"

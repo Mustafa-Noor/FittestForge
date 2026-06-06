@@ -40,8 +40,16 @@ class WorkoutSetAdapter(
             binding.cbDone.setOnCheckedChangeListener { _, isChecked ->
                 sets[adapterPosition] = sets[adapterPosition].copy(completed = isChecked)
             }
+
+            binding.btnRemoveSet.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    onRemoveClick?.invoke(adapterPosition)
+                }
+            }
         }
     }
+
+    var onRemoveClick: ((Int) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetViewHolder {
         val binding = ItemSetRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -57,5 +65,13 @@ class WorkoutSetAdapter(
     fun addSet() {
         sets.add(WorkoutSet())
         notifyItemInserted(sets.size - 1)
+    }
+
+    fun removeSet(position: Int) {
+        if (position in 0 until sets.size) {
+            sets.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, sets.size)
+        }
     }
 }

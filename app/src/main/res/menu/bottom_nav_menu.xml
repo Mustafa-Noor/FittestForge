@@ -8,10 +8,7 @@
         android:id="@+id/nav_workout"
         android:icon="@drawable/ic_workout"
         android:title="Workout" />
-    <item
-        android:id="@+id/nav_progress"
-        android:icon="@drawable/ic_progress"
-        android:title="Progress" />
+
     <item
         android:id="@+id/nav_ai_coach"
         android:icon="@drawable/ic_ai"

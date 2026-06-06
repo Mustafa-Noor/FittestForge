@@ -147,7 +147,7 @@ object ExerciseData {
             bodyPart = "Abs",
             target = "Rectus Abdominis",
             equipment = "Bodyweight",
-            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Crunch.gif",
+            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2015/11/Crunch.gif",
             instructions = listOf("Lie on your back with knees bent", "Place your hands behind your head", "Lift your upper body towards your knees", "Lower slowly"),
             secondaryMuscles = emptyList()
         ),
@@ -157,7 +157,7 @@ object ExerciseData {
             bodyPart = "Abs",
             target = "Core",
             equipment = "Bodyweight",
-            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Plank.gif",
+            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Front-Plank.gif",
             instructions = listOf("Start in a push-up position, but rest on your forearms", "Keep your body in a straight line", "Hold the position"),
             secondaryMuscles = listOf("Shoulders", "Back")
         ),
@@ -169,7 +169,7 @@ object ExerciseData {
             bodyPart = "Full Body",
             target = "Cardio",
             equipment = "Bodyweight",
-            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Burpee.gif",
+            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Burpees.gif",
             instructions = listOf("Start from a standing position", "Drop into a squat position and place your hands on the ground", "Kick your feet back to a plank", "Return to the squat position", "Stand up from the squat position"),
             secondaryMuscles = listOf("Chest", "Legs", "Core")
         )

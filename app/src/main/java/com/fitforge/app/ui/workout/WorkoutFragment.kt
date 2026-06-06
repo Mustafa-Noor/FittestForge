@@ -41,15 +41,15 @@ class WorkoutFragment : Fragment() {
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "Library"
-                1 -> "History"
+                1 -> "Challenges"
                 else -> null
             }
         }.attach()
 
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.action_challenges -> {
-                    startActivity(Intent(requireContext(), ChallengesActivity::class.java))
+                R.id.action_history -> {
+                    startActivity(Intent(requireContext(), WorkoutHistoryActivity::class.java))
                     true
                 }
                 else -> false
@@ -63,7 +63,7 @@ class WorkoutFragment : Fragment() {
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> ExerciseLibraryFragment()
-                else -> WorkoutHistoryFragment()
+                else -> ChallengesFragment()
             }
         }
     }
