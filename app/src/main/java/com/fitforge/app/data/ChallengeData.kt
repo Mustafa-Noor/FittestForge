@@ -16,7 +16,7 @@ object ChallengeData {
             type = "weekly",
             durationDays = 7,
             bannerColor = "#1565C0",
-            bannerEmoji = "🔥",
+            bannerImageUrl = "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=800&q=80",
             days = listOf(
                 ChallengeDay(1, focus = "Core Activation", description = "Start with planks, crunches and leg raises to wake up your core.",
                     exerciseIds = listOf("plank", "crunch", "leg_raise")),
@@ -40,7 +40,7 @@ object ChallengeData {
             type = "weekly",
             durationDays = 7,
             bannerColor = "#2E7D32",
-            bannerEmoji = "💪",
+            bannerImageUrl = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80",
             days = listOf(
                 ChallengeDay(1, focus = "Full Body Intro", description = "Light full body movements to ease in.",
                     exerciseIds = listOf("squat", "push_up", "plank")),
@@ -64,7 +64,7 @@ object ChallengeData {
             type = "weekly",
             durationDays = 7,
             bannerColor = "#B71C1C",
-            bannerEmoji = "🏋️",
+            bannerImageUrl = "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
             days = listOf(
                 ChallengeDay(1, focus = "Chest Day", description = "Push it with bench press and push-up variations.",
                     exerciseIds = listOf("bench_press", "incline_press", "push_up")),
@@ -90,7 +90,7 @@ object ChallengeData {
             type = "monthly",
             durationDays = 30,
             bannerColor = "#4A148C",
-            bannerEmoji = "⚡",
+            bannerImageUrl = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80",
             days = run {
                 val rotation = listOf(
                     ChallengeDay(0, focus = "Push (Chest & Shoulders)", description = "Chest, shoulders and triceps compound movements.",
@@ -120,7 +120,7 @@ object ChallengeData {
             type = "monthly",
             durationDays = 30,
             bannerColor = "#E65100",
-            bannerEmoji = "🔩",
+            bannerImageUrl = "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=800&q=80",
             days = run {
                 val rotation = listOf(
                     ChallengeDay(0, focus = "Squat Focus", description = "Heavy squat day with accessory leg work.",

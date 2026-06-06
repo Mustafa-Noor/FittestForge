@@ -18,13 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="100dp">
 
-            <TextView
-                android:id="@+id/tvChallengeEmoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="🔥"
-                android:textSize="48sp" />
+            <ImageView
+                android:id="@+id/ivChallengeBanner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipDuration"

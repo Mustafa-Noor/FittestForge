@@ -35,6 +35,9 @@ class HomeViewModel : ViewModel() {
     private val _totalWorkouts = MutableLiveData<Int>()
     val totalWorkouts: LiveData<Int> = _totalWorkouts
 
+    private val _calendarWorkoutDates = MutableLiveData<List<String>>()
+    val calendarWorkoutDates: LiveData<List<String>> = _calendarWorkoutDates
+
     private val _totalHours = MutableLiveData<String>()
     val totalHours: LiveData<String> = _totalHours
 
@@ -60,6 +63,9 @@ class HomeViewModel : ViewModel() {
             val workoutResult = workoutRepository.getRecentWorkouts(3)
             val workouts = workoutResult.getOrDefault(emptyList())
             _recentWorkouts.value = workouts
+
+            val allWorkoutsResult = workoutRepository.getWorkouts()
+            _calendarWorkoutDates.value = allWorkoutsResult.getOrDefault(emptyList()).map { it.dateString }
 
             // Momentum logic with decay on open
             var currentMomentumValue = user?.momentum ?: 0f

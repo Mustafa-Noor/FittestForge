@@ -102,12 +102,12 @@ class WorkoutRepository {
             // Fetch recent workouts, excluding recovery and deleted
             val snapshot = getWorkoutCollection()
                 .whereEqualTo("deleted", false)
-                .whereEqualTo("isRecoveryDay", false)
                 .orderBy("date", Query.Direction.DESCENDING)
                 .limit(limitDays.toLong())
                 .get()
                 .await()
-            Result.success(snapshot.toObjects(Workout::class.java))
+            val workouts = snapshot.toObjects(Workout::class.java).filter { !it.isRecoveryDay }
+            Result.success(workouts)
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.fitforge.app.data.models.Challenge
 import com.fitforge.app.databinding.ItemChallengeBinding
 
@@ -25,8 +26,10 @@ class ChallengeAdapter(
 
     inner class ViewHolder(private val binding: ItemChallengeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(challenge: Challenge) {
-            binding.challengeBanner.setBackgroundColor(Color.parseColor(challenge.bannerColor))
-            binding.tvChallengeEmoji.text = challenge.bannerEmoji
+            Glide.with(binding.ivChallengeBanner.context)
+                .load(challenge.bannerImageUrl)
+                .into(binding.ivChallengeBanner)
+            
             binding.chipDuration.text = "${challenge.durationDays} Days"
             binding.tvChallengeTitle.text = challenge.title
             binding.tvChallengeDesc.text = challenge.description

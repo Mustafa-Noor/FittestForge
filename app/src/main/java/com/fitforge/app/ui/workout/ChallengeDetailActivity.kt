@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.fitforge.app.data.ChallengeData
 import com.fitforge.app.data.models.ChallengeDay
 import com.fitforge.app.databinding.ActivityChallengeDetailBinding
@@ -31,8 +32,9 @@ class ChallengeDetailActivity : AppCompatActivity() {
         val challenge = ChallengeData.getById(challengeId) ?: return
 
         supportActionBar?.title = challenge.title
-        binding.challengeBannerDetail.setBackgroundColor(Color.parseColor(challenge.bannerColor))
-        binding.tvDetailEmoji.text = challenge.bannerEmoji
+        Glide.with(this)
+            .load(challenge.bannerImageUrl)
+            .into(binding.ivDetailBanner)
         binding.tvChallengeDescription.text = challenge.description
 
         val prefs = getSharedPreferences("challenge_$challengeId", Context.MODE_PRIVATE)

@@ -120,7 +120,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.ivCalendar.setOnClickListener {
-            val dates = viewModel.recentWorkouts.value?.map { it.dateString } ?: emptyList()
+            val dates = viewModel.calendarWorkoutDates.value ?: emptyList()
             CalendarDialog(dates).show(childFragmentManager, "CalendarDialog")
         }
 

@@ -7,7 +7,7 @@ data class Challenge(
     val type: String,           // "weekly" | "monthly"
     val durationDays: Int,
     val bannerColor: String,    // hex color for the banner background
-    val bannerEmoji: String,
+    val bannerImageUrl: String,
     val days: List<ChallengeDay>
 )
 

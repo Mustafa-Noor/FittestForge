@@ -35,13 +35,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="140dp">
 
-                <TextView
-                    android:id="@+id/tvDetailEmoji"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="🔥"
-                    android:textSize="60sp" />
+                <ImageView
+                    android:id="@+id/ivDetailBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
             </FrameLayout>
 
             <LinearLayout
