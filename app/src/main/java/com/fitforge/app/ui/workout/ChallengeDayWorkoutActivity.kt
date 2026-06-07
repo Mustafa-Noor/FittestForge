@@ -19,9 +19,17 @@ import com.fitforge.app.data.models.Exercise
 import com.fitforge.app.databinding.ActivityChallengeDayWorkoutBinding
 import com.fitforge.app.databinding.ItemChallengeExerciseBinding
 import java.time.LocalDate
+import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import com.fitforge.app.data.repository.UserRepository
+import com.fitforge.app.data.models.WorkoutExercise
+import com.fitforge.app.data.models.WorkoutSet
 
 class ChallengeDayWorkoutActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChallengeDayWorkoutBinding
+    private val viewModel: LogWorkoutViewModel by viewModels()
+    private val userRepository = UserRepository()
     private lateinit var challengeId: String
     private var dayNumber: Int = 0
     private var exercises = mutableListOf<ExerciseItem>()
@@ -83,8 +91,30 @@ class ChallengeDayWorkoutActivity : AppCompatActivity() {
         binding.rvExercises.layoutManager = LinearLayoutManager(this)
         binding.rvExercises.adapter = adapter
 
+        setupObservers()
+
         binding.btnCompleteDay.setOnClickListener {
             completeDay()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.saveResult.observe(this) { result ->
+            if (isFinishing || isDestroyed) return@observe
+            binding.btnCompleteDay.isEnabled = true
+            if (result.success) {
+                Toast.makeText(applicationContext, "Day $dayNumber Completed! Great job!", Toast.LENGTH_LONG).show()
+                val intent = Intent(this, WorkoutCompleteActivity::class.java).apply {
+                    putExtra("NEW_MOMENTUM", result.newMomentum)
+                    putExtra("NEW_STREAK", result.newStreak)
+                    putStringArrayListExtra("NEW_BADGES", ArrayList(result.newBadges))
+                }
+                startActivity(intent)
+                setResult(Activity.RESULT_OK)
+                finish()
+            } else {
+                Toast.makeText(applicationContext, "Error saving workout: ${result.error}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -95,18 +125,32 @@ class ChallengeDayWorkoutActivity : AppCompatActivity() {
     }
 
     private fun completeDay() {
-        val prefs = getSharedPreferences("challenge_$challengeId", Context.MODE_PRIVATE)
-        val completedDays = prefs.getStringSet("completed_days", mutableSetOf())?.toMutableSet() ?: mutableSetOf()
-        completedDays.add(dayNumber.toString())
+        binding.btnCompleteDay.isEnabled = false
         
-        prefs.edit()
-            .putStringSet("completed_days", completedDays)
-            .putString("last_completed_date", LocalDate.now().toString())
-            .apply()
+        lifecycleScope.launch {
+            val user = userRepository.getUserProfile().getOrNull()
+            val completedDaysStr = user?.completedChallengeDays?.get(challengeId) ?: emptyList()
+            val completedDays = completedDaysStr.toMutableSet()
+            completedDays.add(dayNumber.toString())
+            
+            userRepository.updateChallengeProgress(
+                challengeId = challengeId,
+                completedDays = completedDays.toList(),
+                lastCompletedDate = LocalDate.now().toString()
+            )
 
-        Toast.makeText(this, "Day $dayNumber Completed! Great job!", Toast.LENGTH_LONG).show()
-        setResult(Activity.RESULT_OK)
-        finish()
+            val workoutExercises = exercises.map {
+                WorkoutExercise(
+                    exerciseId = it.exercise.id,
+                    exerciseName = it.exercise.name,
+                    muscleGroup = it.exercise.bodyPart,
+                    sets = listOf(WorkoutSet(reps = 10, weightKg = 0f, completed = true)) // Save dummy completion sets
+                )
+            }
+            
+            // Save globally
+            viewModel.saveWorkout(workoutExercises, "Challenge: Day $dayNumber", System.currentTimeMillis() - 30 * 60000)
+        }
     }
 }
 

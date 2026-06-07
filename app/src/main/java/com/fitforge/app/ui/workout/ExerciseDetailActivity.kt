@@ -88,35 +88,44 @@ class ExerciseDetailActivity : AppCompatActivity() {
             }
             binding.btnFinishWorkout.isEnabled = false
 
-            val workoutExercise = WorkoutExercise(
-                exerciseId = exerciseId,
-                exerciseName = exerciseName,
-                muscleGroup = exerciseBodyPart,
-                sets = validSets
-            )
-
-            viewModel.saveWorkout(listOf(workoutExercise), "", startTimeMillis)
+            val isChallengeMode = intent.getBooleanExtra("IS_CHALLENGE_MODE", false)
+            if (isChallengeMode) {
+                // In challenge mode, do not save individually. 
+                // Return success immediately to ChallengeDayWorkoutActivity.
+                val resultIntent = Intent().apply {
+                    putExtra("COMPLETED_EXERCISE_ID", exerciseId)
+                }
+                setResult(android.app.Activity.RESULT_OK, resultIntent)
+                finish()
+            } else {
+                val workoutExercise = WorkoutExercise(
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    muscleGroup = exerciseBodyPart,
+                    sets = validSets
+                )
+                viewModel.saveWorkout(listOf(workoutExercise), "", startTimeMillis)
+            }
         }
     }
 
     private fun setupObservers() {
         viewModel.saveResult.observe(this) { result ->
+            if (isFinishing || isDestroyed) return@observe
             binding.btnFinishWorkout.isEnabled = true
             if (result.success) {
-                Toast.makeText(this, "Exercise saved to your workout log! You can go back now.", Toast.LENGTH_LONG).show()
                 binding.btnFinishWorkout.text = "SAVED"
-
-                val isChallengeMode = intent.getBooleanExtra("IS_CHALLENGE_MODE", false)
-                if (isChallengeMode) {
-                    val exerciseId = intent.getStringExtra("EXERCISE_ID")
-                    val resultIntent = Intent().apply {
-                        putExtra("COMPLETED_EXERCISE_ID", exerciseId)
-                    }
-                    setResult(android.app.Activity.RESULT_OK, resultIntent)
-                    finish()
+                
+                val completeIntent = Intent(this, WorkoutCompleteActivity::class.java).apply {
+                    putExtra("NEW_MOMENTUM", result.newMomentum)
+                    putExtra("NEW_STREAK", result.newStreak)
+                    putStringArrayListExtra("NEW_BADGES", ArrayList(result.newBadges))
                 }
+                startActivity(completeIntent)
+                finish()
             } else {
-                Toast.makeText(this, "Error: ${result.error}", Toast.LENGTH_LONG).show()
+                binding.btnFinishWorkout.text = "FINISH EXERCISE"
+                Toast.makeText(applicationContext, "Error saving exercise: ${result.error}", Toast.LENGTH_LONG).show()
             }
         }
     }

@@ -25,5 +25,8 @@ data class User(
     val lastMuscleGroup: String = "",
     val fcmToken: String = "",
     val badges: Map<String, Boolean> = emptyMap(),
-    val badgeUnlockedAt: Map<String, Timestamp> = emptyMap()
+    val badgeUnlockedAt: Map<String, Timestamp> = emptyMap(),
+    val completedChallengeDays: Map<String, List<String>> = emptyMap(),
+    val challengeLastCompletedDate: Map<String, String> = emptyMap(),
+    val maintenanceCalories: Int = 0
 )
