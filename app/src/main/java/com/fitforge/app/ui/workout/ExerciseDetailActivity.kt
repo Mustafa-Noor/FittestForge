@@ -3,17 +3,16 @@ package com.fitforge.app.ui.workout
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.fitforge.app.R
 import com.fitforge.app.adapters.WorkoutSetAdapter
 import com.fitforge.app.data.models.WorkoutExercise
 import com.fitforge.app.data.models.WorkoutSet
 import com.fitforge.app.databinding.ActivityExerciseDetailBinding
-import com.fitforge.app.utils.showToast
 
 class ExerciseDetailActivity : AppCompatActivity() {
 
@@ -44,8 +43,9 @@ class ExerciseDetailActivity : AppCompatActivity() {
 
         if (exerciseGif.isNotEmpty()) {
             Glide.with(this)
+                .asGif()
                 .load(exerciseGif)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.ivDetailGif)
         }
 
@@ -83,40 +83,49 @@ class ExerciseDetailActivity : AppCompatActivity() {
         binding.btnFinishWorkout.setOnClickListener {
             val validSets = setsList.filter { it.completed && it.reps > 0 }
             if (validSets.isEmpty()) {
-                showToast("Complete at least one set")
+                Toast.makeText(this, "Complete at least one set", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             binding.btnFinishWorkout.isEnabled = false
 
-            val workoutExercise = WorkoutExercise(
-                exerciseId = exerciseId,
-                exerciseName = exerciseName,
-                muscleGroup = exerciseBodyPart,
-                sets = validSets
-            )
-
-            viewModel.saveWorkout(listOf(workoutExercise), "", startTimeMillis)
+            val isChallengeMode = intent.getBooleanExtra("IS_CHALLENGE_MODE", false)
+            if (isChallengeMode) {
+                // In challenge mode, do not save individually. 
+                // Return success immediately to ChallengeDayWorkoutActivity.
+                val resultIntent = Intent().apply {
+                    putExtra("COMPLETED_EXERCISE_ID", exerciseId)
+                }
+                setResult(android.app.Activity.RESULT_OK, resultIntent)
+                finish()
+            } else {
+                val workoutExercise = WorkoutExercise(
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    muscleGroup = exerciseBodyPart,
+                    sets = validSets
+                )
+                viewModel.saveWorkout(listOf(workoutExercise), "", startTimeMillis)
+            }
         }
     }
 
     private fun setupObservers() {
         viewModel.saveResult.observe(this) { result ->
+            if (isFinishing || isDestroyed) return@observe
             binding.btnFinishWorkout.isEnabled = true
             if (result.success) {
-                showToast("Exercise saved to your workout log! You can go back now.")
                 binding.btnFinishWorkout.text = "SAVED"
-
-                val isChallengeMode = intent.getBooleanExtra("IS_CHALLENGE_MODE", false)
-                if (isChallengeMode) {
-                    val exerciseId = intent.getStringExtra("EXERCISE_ID")
-                    val resultIntent = Intent().apply {
-                        putExtra("COMPLETED_EXERCISE_ID", exerciseId)
-                    }
-                    setResult(android.app.Activity.RESULT_OK, resultIntent)
-                    finish()
+                
+                val completeIntent = Intent(this, WorkoutCompleteActivity::class.java).apply {
+                    putExtra("NEW_MOMENTUM", result.newMomentum)
+                    putExtra("NEW_STREAK", result.newStreak)
+                    putStringArrayListExtra("NEW_BADGES", ArrayList(result.newBadges))
                 }
+                startActivity(completeIntent)
+                finish()
             } else {
-                showToast("Error: ${result.error}")
+                binding.btnFinishWorkout.text = "FINISH EXERCISE"
+                Toast.makeText(applicationContext, "Error saving exercise: ${result.error}", Toast.LENGTH_LONG).show()
             }
         }
     }

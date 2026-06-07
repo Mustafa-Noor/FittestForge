@@ -96,4 +96,30 @@ class UserRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun updateChallengeProgress(
+        challengeId: String,
+        completedDays: List<String>,
+        lastCompletedDate: String
+    ): Result<Unit> {
+        return try {
+            val updates = mapOf(
+                "completedChallengeDays.$challengeId" to completedDays,
+                "challengeLastCompletedDate.$challengeId" to lastCompletedDate
+            )
+            usersCollection.document(getUserId()).update(updates).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateMaintenanceCalories(calories: Int): Result<Unit> {
+        return try {
+            usersCollection.document(getUserId()).update("maintenanceCalories", calories).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
