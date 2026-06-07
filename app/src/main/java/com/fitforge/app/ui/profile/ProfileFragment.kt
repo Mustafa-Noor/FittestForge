@@ -30,7 +30,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loadUserData()
         setupImagePicker()
 
         binding.btnSeeBadges.setOnClickListener {
@@ -58,6 +57,11 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        loadUserData()
+    }
+
 
 
     private fun loadUserData() {
@@ -66,6 +70,17 @@ class ProfileFragment : Fragment() {
                 user?.let {
                     binding.tvName.text = it.displayName
                     binding.tvEmail.text = it.email
+                    binding.tvProfileGoal.text = if (it.fitnessGoal.isBlank()) {
+                        "Goal: Stay consistent"
+                    } else {
+                        "Goal: ${it.fitnessGoal.replaceFirstChar { char -> char.uppercase() }}"
+                    }
+                    binding.tvProfileMomentum.text = "${it.momentum.toInt()}%"
+                    binding.tvProfileStreak.text = it.currentStreak.toString()
+                    binding.tvProfileWorkouts.text = it.totalWorkouts.toString()
+                    binding.tvProfileHours.text = String.format("%.1fh", it.totalMinutes / 60f)
+                    binding.tvProfileBest.text = it.bestStreak.toString()
+
                     val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                     val localImage = prefs.getString("local_profile_image", null)
                     

@@ -1,7 +1,6 @@
 package com.fitforge.app.ui.auth
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fitforge.app.data.models.User
@@ -10,8 +9,8 @@ import com.fitforge.app.data.repository.UserRepository
 import com.fitforge.app.databinding.ActivitySignupBinding
 import kotlinx.coroutines.launch
 import android.content.Intent
-import com.fitforge.app.ui.onboarding.OnboardingActivity
 import com.fitforge.app.ui.onboarding.SetupProfileActivity
+import com.fitforge.app.utils.showToast
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 
@@ -35,12 +34,12 @@ class SignupActivity : AppCompatActivity() {
             val confirm = binding.etConfirmPassword.text.toString()
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                showToast("Please fill all fields")
                 return@setOnClickListener
             }
 
             if (password != confirm) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                showToast("Passwords do not match")
                 return@setOnClickListener
             }
 
@@ -64,15 +63,11 @@ class SignupActivity : AppCompatActivity() {
                         if (profileResult.isFailure) {
                             binding.btnSignup.isEnabled = true
                             binding.btnSignup.text = "SIGN UP"
-                            Toast.makeText(
-                                this@SignupActivity,
-                                profileResult.exceptionOrNull()?.localizedMessage ?: "Failed to create profile",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            showToast(profileResult.exceptionOrNull()?.localizedMessage ?: "Failed to create profile")
                             return@launch
                         }
                     }
-                    Toast.makeText(this@SignupActivity, "Account created!", Toast.LENGTH_SHORT).show()
+                    showToast("Account created!")
                     val intent = Intent(this@SignupActivity, SetupProfileActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
@@ -80,7 +75,7 @@ class SignupActivity : AppCompatActivity() {
                 } else {
                     binding.btnSignup.isEnabled = true
                     binding.btnSignup.text = "SIGN UP"
-                    Toast.makeText(this@SignupActivity, result.exceptionOrNull()?.localizedMessage ?: "Signup failed", Toast.LENGTH_SHORT).show()
+                    showToast(result.exceptionOrNull()?.localizedMessage ?: "Signup failed")
                 }
             }
         }

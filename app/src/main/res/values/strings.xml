@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FitForge</string>
+    <string name="ai_coach_title">AI Coach</string>
+    <string name="ai_mode_hype">Hype Mode</string>
+    <string name="ai_suggestion_plan">Plan my week</string>
+    <string name="ai_suggestion_progress">Progress check</string>
+    <string name="ai_suggestion_rest">Rest day advice</string>
+    <string name="ai_coach_thinking">Coach is thinking...</string>
+    <string name="ai_input_hint">Ask your coach...</string>
 </resources>

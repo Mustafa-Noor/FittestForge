@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fitforge.app.R
 import com.fitforge.app.data.ChallengeData
 import com.fitforge.app.data.local.ExerciseData
@@ -130,6 +131,12 @@ class ChallengeDayExerciseAdapter(
         fun bind(item: ChallengeDayWorkoutActivity.ExerciseItem) {
             binding.tvExerciseName.text = item.exercise.name
             binding.tvExerciseTarget.text = "Target: ${item.exercise.target}"
+
+            Glide.with(binding.root.context)
+                .load(item.exercise.gifUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(160, 160)
+                .into(binding.ivExerciseIcon)
 
             if (item.isCompleted) {
                 binding.ivStatus.setImageResource(R.drawable.ic_check)

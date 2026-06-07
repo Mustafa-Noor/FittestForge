@@ -2,11 +2,11 @@ package com.fitforge.app.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fitforge.app.data.repository.AuthRepository
 import com.fitforge.app.databinding.ActivityLoginBinding
+import com.fitforge.app.utils.showToast
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                showToast("Please enter email and password")
                 return@setOnClickListener
             }
 
@@ -34,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 val result = authRepository.signIn(email, password)
                 if (result.isSuccess) {
-                    Toast.makeText(this@LoginActivity, "Login Successful!", Toast.LENGTH_SHORT).show()
+                    showToast("Login Successful!")
                     val intent = Intent(this@LoginActivity, com.fitforge.app.MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
@@ -42,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     binding.btnLogin.isEnabled = true
                     binding.btnLogin.text = "SIGN IN"
-                    Toast.makeText(this@LoginActivity, result.exceptionOrNull()?.localizedMessage ?: "Login failed", Toast.LENGTH_SHORT).show()
+                    showToast(result.exceptionOrNull()?.localizedMessage ?: "Login failed")
                 }
             }
         }

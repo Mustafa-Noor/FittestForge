@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.fitforge.app.data.ChallengeData
+import com.fitforge.app.data.models.Challenge
 import com.fitforge.app.data.models.ChallengeDay
 import com.fitforge.app.databinding.ActivityChallengeDetailBinding
 import com.fitforge.app.databinding.ItemChallengeDayBinding
@@ -18,6 +19,7 @@ import java.time.LocalDate
 
 class ChallengeDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChallengeDetailBinding
+    private var challengeId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +30,18 @@ class ChallengeDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        val challengeId = intent.getStringExtra("challenge_id") ?: return
-        val challenge = ChallengeData.getById(challengeId) ?: return
+        challengeId = intent.getStringExtra("challenge_id")
+        refreshUI()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshUI()
+    }
+
+    private fun refreshUI() {
+        val id = challengeId ?: return
+        val challenge = ChallengeData.getById(id) ?: return
 
         supportActionBar?.title = challenge.title
         Glide.with(this)
@@ -37,41 +49,32 @@ class ChallengeDetailActivity : AppCompatActivity() {
             .into(binding.ivDetailBanner)
         binding.tvChallengeDescription.text = challenge.description
 
-        val prefs = getSharedPreferences("challenge_$challengeId", Context.MODE_PRIVATE)
-        val startDateStr = prefs.getString("start_date", null)
-        val startDate = if (startDateStr != null) LocalDate.parse(startDateStr) else {
-            val today = LocalDate.now().toString()
-            prefs.edit().putString("start_date", today).apply()
-            LocalDate.now()
-        }
-
+        val prefs = getSharedPreferences("challenge_$id", Context.MODE_PRIVATE)
         val completedDays = prefs.getStringSet("completed_days", emptySet()) ?: emptySet()
         val lastCompletedDateStr = prefs.getString("last_completed_date", null)
         val today = LocalDate.now().toString()
         val isLastCompletedToday = lastCompletedDateStr == today
 
         val currentDay = if (isLastCompletedToday) {
-            completedDays.size // They cannot start the next day yet
+            completedDays.size 
         } else {
-            completedDays.size + 1 // They can start the next day
+            completedDays.size + 1
         }.coerceIn(1, challenge.durationDays)
 
         val adapter = ChallengeDayAdapter(challenge.days, currentDay, completedDays) { day ->
             if (!day.isRestDay) {
-                // Launch the new Guided Workout list
                 val intent = Intent(this, ChallengeDayWorkoutActivity::class.java)
-                intent.putExtra("challenge_id", challengeId)
+                intent.putExtra("challenge_id", id)
                 intent.putExtra("challenge_day_number", day.dayNumber)
                 startActivity(intent)
             } else {
-                // Mark rest day as complete
                 val newCompleted = completedDays.toMutableSet()
                 newCompleted.add(day.dayNumber.toString())
                 prefs.edit()
                     .putStringSet("completed_days", newCompleted)
                     .putString("last_completed_date", today)
                     .apply()
-                recreate()
+                refreshUI()
             }
         }
 

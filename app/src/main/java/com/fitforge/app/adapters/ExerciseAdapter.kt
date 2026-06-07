@@ -28,12 +28,10 @@ class ExerciseAdapter(private val onExerciseClick: (Exercise) -> Unit) :
             binding.tvExerciseName.text = exercise.name
             binding.tvBodyPart.text = exercise.bodyPart
 
-            // Do not load GIF constantly during list scroll per instructions.
-            // But if we do here, we need placeholders. Let's just load it as static or slow GIF.
+            // Removed placeholder to restore "skeleton" feel from background color
             Glide.with(itemView.context)
-                .asGif()
                 .load(exercise.gifUrl)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .override(300, 300)
                 .into(binding.ivExerciseGif)
 

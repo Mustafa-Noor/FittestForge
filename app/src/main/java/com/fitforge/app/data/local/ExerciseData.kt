@@ -91,7 +91,7 @@ object ExerciseData {
             bodyPart = "Legs",
             target = "Hamstrings",
             equipment = "Barbell",
-            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Romanian-Deadlift.gif",
+            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Romanian-Deadlift.gif",
             instructions = listOf("Hold barbell with an overhand grip", "Hinge at the hips while keeping your legs mostly straight", "Lower the bar until you feel a stretch in your hamstrings", "Return to standing"),
             secondaryMuscles = listOf("Glutes", "Lower Back")
         ),
@@ -103,7 +103,7 @@ object ExerciseData {
             bodyPart = "Shoulders",
             target = "Deltoids",
             equipment = "Barbell",
-            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Overhead-Press.gif",
+            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/07/Barbell-Standing-Military-Press.gif",
             instructions = listOf("Stand with the barbell resting on your front shoulders", "Press the bar straight overhead", "Lower it slowly back to your shoulders"),
             secondaryMuscles = listOf("Triceps", "Upper Chest")
         ),
@@ -157,7 +157,7 @@ object ExerciseData {
             bodyPart = "Abs",
             target = "Core",
             equipment = "Bodyweight",
-            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Front-Plank.gif",
+            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/plank.gif",
             instructions = listOf("Start in a push-up position, but rest on your forearms", "Keep your body in a straight line", "Hold the position"),
             secondaryMuscles = listOf("Shoulders", "Back")
         ),
@@ -169,7 +169,7 @@ object ExerciseData {
             bodyPart = "Full Body",
             target = "Cardio",
             equipment = "Bodyweight",
-            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/Burpees.gif",
+            gifUrl = "https://fitnessprogramer.com/wp-content/uploads/2021/02/burpees.gif",
             instructions = listOf("Start from a standing position", "Drop into a squat position and place your hands on the ground", "Kick your feet back to a plank", "Return to the squat position", "Stand up from the squat position"),
             secondaryMuscles = listOf("Chest", "Legs", "Core")
         )

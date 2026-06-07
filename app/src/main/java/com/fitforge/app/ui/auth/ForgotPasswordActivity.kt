@@ -1,11 +1,13 @@
 package com.fitforge.app.ui.auth
 
 import android.os.Bundle
-import android.widget.Toast
+import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fitforge.app.data.repository.AuthRepository
 import com.fitforge.app.databinding.ActivityForgotPasswordBinding
+import com.fitforge.app.utils.showToast
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class ForgotPasswordActivity : AppCompatActivity() {
@@ -22,25 +24,45 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
         binding.btnReset.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
-            if (email.isEmpty()) {
-                Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show()
+            binding.tilEmail.error = null
+
+            if (!isValidEmail(email)) {
+                binding.tilEmail.error = "Enter a valid email address"
+                binding.etEmail.requestFocus()
                 return@setOnClickListener
             }
 
-            binding.btnReset.isEnabled = false
-            binding.btnReset.text = "Sending..."
+            setLoading(true)
 
             lifecycleScope.launch {
                 val result = authRepository.resetPassword(email)
+                setLoading(false)
+
                 if (result.isSuccess) {
-                    Toast.makeText(this@ForgotPasswordActivity, "Reset link sent!", Toast.LENGTH_SHORT).show()
-                    finish()
+                    showResetSentDialog(email)
                 } else {
-                    binding.btnReset.isEnabled = true
-                    binding.btnReset.text = "SEND RESET LINK"
-                    Toast.makeText(this@ForgotPasswordActivity, result.exceptionOrNull()?.localizedMessage ?: "Failed", Toast.LENGTH_SHORT).show()
+                    showToast(result.exceptionOrNull()?.localizedMessage ?: "Could not send reset link")
                 }
             }
         }
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        return email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        binding.etEmail.isEnabled = !isLoading
+        binding.btnReset.isEnabled = !isLoading
+        binding.btnReset.text = if (isLoading) "Sending..." else "SEND RESET LINK"
+    }
+
+    private fun showResetSentDialog(email: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Reset Link Sent")
+            .setMessage("If an account exists for $email, Firebase will email a password reset link. Check your inbox and spam folder.")
+            .setPositiveButton("Back to sign in") { _, _ -> finish() }
+            .setOnCancelListener { finish() }
+            .show()
     }
 }

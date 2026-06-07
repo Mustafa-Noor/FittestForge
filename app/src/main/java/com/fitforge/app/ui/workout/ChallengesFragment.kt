@@ -22,7 +22,16 @@ class ChallengesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+        refreshChallenges()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshChallenges()
+    }
+
+    private fun refreshChallenges() {
+        if (_binding == null) return
         setupChallengeList(binding.rvWeeklyChallenges, ChallengeData.getWeekly())
         setupChallengeList(binding.rvMonthlyChallenges, ChallengeData.getMonthly())
     }

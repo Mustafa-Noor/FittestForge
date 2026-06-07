@@ -15,6 +15,7 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private var momentumQuoteIndex = 0
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -24,6 +25,11 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.loadHomeData()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,6 +62,7 @@ class HomeFragment : Fragment() {
             binding.momentumProgressBar.setProgressWithAnimation(momentum.value, 1000)
             binding.tvMomentumValue.text = "${momentum.value.toInt()}%"
             binding.tvMomentumLabel.text = momentum.label
+            binding.tvMomentumMessage.text = nextMomentumQuote(momentum.value)
             
             val params = binding.momentumFill.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
             params.matchConstraintPercentWidth = if (momentum.value > 0) momentum.value / 100f else 0.01f
@@ -126,6 +133,35 @@ class HomeFragment : Fragment() {
 
         // For demo/testing: set date
         binding.tvDate.text = java.text.SimpleDateFormat("EEEE, d MMMM", java.util.Locale.getDefault()).format(java.util.Date())
+    }
+
+    private fun nextMomentumQuote(momentumValue: Float): String {
+        val quotes = when {
+            momentumValue >= 80f -> listOf(
+                "Peak pace. Keep the reps clean and the streak honest.",
+                "You are stacked with momentum right now. Spend it on something hard.",
+                "High output mode. Stay sharp, hydrate, and finish strong."
+            )
+            momentumValue >= 55f -> listOf(
+                "Good rhythm. One focused session keeps the engine warm.",
+                "Momentum is building. Make today count before it cools.",
+                "You are in the pocket. A clean workout keeps the graph climbing."
+            )
+            momentumValue >= 30f -> listOf(
+                "Not gone, just quiet. A short session still moves the needle.",
+                "Restart small. Ten honest minutes beats waiting for perfect energy.",
+                "Momentum answers action. Pick one lift, one walk, one win."
+            )
+            else -> listOf(
+                "Low battery is still battery. Start tiny and protect the comeback.",
+                "No drama. One logged effort is enough to turn the dial.",
+                "Reset the rhythm today. Small, simple, finished."
+            )
+        }
+
+        val quote = quotes[momentumQuoteIndex % quotes.size]
+        momentumQuoteIndex += 1
+        return quote
     }
 
     override fun onDestroyView() {

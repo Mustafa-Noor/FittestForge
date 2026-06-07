@@ -3,16 +3,17 @@ package com.fitforge.app.ui.workout
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.fitforge.app.R
 import com.fitforge.app.adapters.WorkoutSetAdapter
 import com.fitforge.app.data.models.WorkoutExercise
 import com.fitforge.app.data.models.WorkoutSet
 import com.fitforge.app.databinding.ActivityExerciseDetailBinding
+import com.fitforge.app.utils.showToast
 
 class ExerciseDetailActivity : AppCompatActivity() {
 
@@ -43,9 +44,8 @@ class ExerciseDetailActivity : AppCompatActivity() {
 
         if (exerciseGif.isNotEmpty()) {
             Glide.with(this)
-                .asGif()
                 .load(exerciseGif)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(binding.ivDetailGif)
         }
 
@@ -83,7 +83,7 @@ class ExerciseDetailActivity : AppCompatActivity() {
         binding.btnFinishWorkout.setOnClickListener {
             val validSets = setsList.filter { it.completed && it.reps > 0 }
             if (validSets.isEmpty()) {
-                Toast.makeText(this, "Complete at least one set", Toast.LENGTH_SHORT).show()
+                showToast("Complete at least one set")
                 return@setOnClickListener
             }
             binding.btnFinishWorkout.isEnabled = false
@@ -103,7 +103,7 @@ class ExerciseDetailActivity : AppCompatActivity() {
         viewModel.saveResult.observe(this) { result ->
             binding.btnFinishWorkout.isEnabled = true
             if (result.success) {
-                Toast.makeText(this, "Exercise saved to your workout log! You can go back now.", Toast.LENGTH_LONG).show()
+                showToast("Exercise saved to your workout log! You can go back now.")
                 binding.btnFinishWorkout.text = "SAVED"
 
                 val isChallengeMode = intent.getBooleanExtra("IS_CHALLENGE_MODE", false)
@@ -116,7 +116,7 @@ class ExerciseDetailActivity : AppCompatActivity() {
                     finish()
                 }
             } else {
-                Toast.makeText(this, "Error: ${result.error}", Toast.LENGTH_LONG).show()
+                showToast("Error: ${result.error}")
             }
         }
     }
