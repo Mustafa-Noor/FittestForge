@@ -57,22 +57,30 @@ class LogWorkoutViewModel : ViewModel() {
                     _saveResult.value = SaveResult(success = false, error = "Failed to fetch user profile")
                     return@launch
                 }
-                val userBeforeWorkout = initialUserResult.getOrNull() ?: return@launch
+                val userBeforeWorkout = initialUserResult.getOrNull()
+                if (userBeforeWorkout == null) {
+                    _saveResult.value = SaveResult(success = false, error = "User profile not found")
+                    return@launch
+                }
 
                 // 1. Calculate Streak using previous lastWorkoutDate
                 var newStreak = userBeforeWorkout.currentStreak
                 val lastWorkoutDateStr = userBeforeWorkout.lastWorkoutDate
                 
                 if (lastWorkoutDateStr.isNotEmpty()) {
-                    val lastDate = LocalDate.parse(lastWorkoutDateStr)
-                    val daysBetween = ChronoUnit.DAYS.between(lastDate, today)
-                    
-                    if (daysBetween == 1L) {
-                        newStreak += 1
-                    } else if (daysBetween > 1L) {
+                    val lastDate = parseDateOrNull(lastWorkoutDateStr)
+                    if (lastDate == null) {
                         newStreak = 1
+                    } else {
+                        val daysBetween = ChronoUnit.DAYS.between(lastDate, today)
+
+                        if (daysBetween == 1L) {
+                            newStreak += 1
+                        } else if (daysBetween > 1L) {
+                            newStreak = 1
+                        }
+                        // if daysBetween == 0, streak remains same (already logged today)
                     }
-                    // if daysBetween == 0, streak remains same (already logged today)
                 } else {
                     newStreak = 1
                 }
@@ -106,12 +114,20 @@ class LogWorkoutViewModel : ViewModel() {
                     )
 
                     // 6. Update user with new momentum and streak
-                    userRepository.updateMomentumAndStreak(
+                    val momentumUpdateResult = userRepository.updateMomentumAndStreak(
                         newMomentum = newMomentum,
                         newStreak = newStreak,
                         bestStreak = bestStreak,
                         lastWorkoutDate = todayString
                     )
+                    if (momentumUpdateResult.isFailure) {
+                        _saveResult.value = SaveResult(
+                            success = false,
+                            error = momentumUpdateResult.exceptionOrNull()?.localizedMessage
+                                ?: "Workout saved, but profile stats could not be updated"
+                        )
+                        return@launch
+                    }
 
                     _saveResult.value = SaveResult(
                         success = true,
@@ -174,12 +190,20 @@ class LogWorkoutViewModel : ViewModel() {
                     )
 
                     // 5. Update user with new momentum and streak
-                    userRepository.updateMomentumAndStreak(
+                    val momentumUpdateResult = userRepository.updateMomentumAndStreak(
                         newMomentum = newMomentum,
                         newStreak = user.currentStreak, // Streak does NOT increment/change on recovery day
                         bestStreak = user.bestStreak,
                         lastWorkoutDate = user.lastWorkoutDate // Last workout date remains unchanged
                     )
+                    if (momentumUpdateResult.isFailure) {
+                        _saveResult.value = SaveResult(
+                            success = false,
+                            error = momentumUpdateResult.exceptionOrNull()?.localizedMessage
+                                ?: "Recovery day saved, but profile stats could not be updated"
+                        )
+                        return@launch
+                    }
 
                     _saveResult.value = SaveResult(
                         success = true,
@@ -195,5 +219,9 @@ class LogWorkoutViewModel : ViewModel() {
                 _saveResult.value = SaveResult(success = false, error = e.message)
             }
         }
+    }
+
+    private fun parseDateOrNull(value: String): LocalDate? {
+        return runCatching { LocalDate.parse(value) }.getOrNull()
     }
 }

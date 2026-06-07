@@ -10,7 +10,6 @@ import com.fitforge.app.data.models.WorkoutSet
 import com.fitforge.app.databinding.ActivityLogWorkoutBinding
 
 import androidx.activity.viewModels
-import com.fitforge.app.ui.workout.LogWorkoutViewModel
 
 class LogWorkoutActivity : AppCompatActivity() {
 
@@ -71,14 +70,19 @@ class LogWorkoutActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         adapter = WorkoutExerciseAdapter(exerciseList, 
             onAddSet = { pos ->
-                val sets = exerciseList[pos].sets.toMutableList()
-                sets.add(WorkoutSet())
-                exerciseList[pos] = exerciseList[pos].copy(sets = sets)
-                adapter.notifyItemChanged(pos)
+                val exercise = exerciseList.getOrNull(pos)
+                if (exercise != null) {
+                    val sets = exercise.sets.toMutableList()
+                    sets.add(WorkoutSet())
+                    exerciseList[pos] = exercise.copy(sets = sets)
+                    adapter.notifyItemChanged(pos)
+                }
             },
             onRemoveExercise = { pos ->
-                exerciseList.removeAt(pos)
-                adapter.notifyItemRemoved(pos)
+                if (pos in exerciseList.indices) {
+                    exerciseList.removeAt(pos)
+                    adapter.notifyItemRemoved(pos)
+                }
             }
         )
         binding.rvWorkoutSets.layoutManager = LinearLayoutManager(this)

@@ -5,7 +5,9 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import com.fitforge.app.utils.FitForgeNotificationManager
 import com.fitforge.app.utils.FitForgeAudioManager
+import com.fitforge.app.utils.NotificationScheduler
 import com.google.firebase.FirebaseApp
 
 class FitForgeApplication : Application() {
@@ -14,6 +16,7 @@ class FitForgeApplication : Application() {
         FirebaseApp.initializeApp(this)
         FitForgeAudioManager.init(this)
         createNotificationChannels()
+        NotificationScheduler.scheduleDailyReminder(this)
     }
 
     private fun createNotificationChannels() {
@@ -21,11 +24,11 @@ class FitForgeApplication : Application() {
             val channels = listOf(
                 NotificationChannel("ROAST", "Motivation Notifications", NotificationManager.IMPORTANCE_DEFAULT)
                     .apply { description = "Personality-mode messages when you skip" },
-                NotificationChannel("REMINDER", "Daily Reminder", NotificationManager.IMPORTANCE_LOW)
+                NotificationChannel(FitForgeNotificationManager.CHANNEL_REMINDER, "Daily Reminder", NotificationManager.IMPORTANCE_DEFAULT)
                     .apply { description = "Gentle daily nudge" },
-                NotificationChannel("BADGE", "Achievement Alerts", NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(FitForgeNotificationManager.CHANNEL_BADGE, "Achievement Alerts", NotificationManager.IMPORTANCE_HIGH)
                     .apply { description = "Badge unlock alerts" },
-                NotificationChannel("STREAK", "Streak Alerts", NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationChannel(FitForgeNotificationManager.CHANNEL_STREAK, "Streak Alerts", NotificationManager.IMPORTANCE_DEFAULT)
                     .apply { description = "Streak milestone alerts" },
             )
             val manager = getSystemService(NotificationManager::class.java)

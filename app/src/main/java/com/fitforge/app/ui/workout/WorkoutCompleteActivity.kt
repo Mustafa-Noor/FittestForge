@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.fitforge.app.databinding.ActivityWorkoutCompleteBinding
+import com.fitforge.app.utils.FitForgeNotificationManager
 import kotlin.random.Random
 
 class WorkoutCompleteActivity : AppCompatActivity() {
@@ -26,10 +27,13 @@ class WorkoutCompleteActivity : AppCompatActivity() {
 
         val newMomentum = intent.getFloatExtra("NEW_MOMENTUM", 0f)
         val newStreak = intent.getIntExtra("NEW_STREAK", 0)
+        val newBadges = intent.getStringArrayListExtra("NEW_BADGES") ?: arrayListOf()
 
         binding.tvNewMomentum.text = "${newMomentum.toInt()}%"
         binding.tvNewStreak.text = "🔥 $newStreak"
-        
+        FitForgeNotificationManager.showBadgeUnlocked(this, newBadges)
+        FitForgeNotificationManager.showStreakMilestone(this, newStreak)
+
         binding.tvMotivationalQuote.text = quotes[Random.nextInt(quotes.size)]
 
         binding.btnBackToHome.setOnClickListener {

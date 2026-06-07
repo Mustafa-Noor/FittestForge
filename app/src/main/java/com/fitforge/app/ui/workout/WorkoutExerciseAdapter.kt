@@ -107,6 +107,7 @@ class WorkoutExerciseAdapter(
         if (exercise.sets.size <= 1) return
 
         val sets = exercise.sets.toMutableList()
+        if (setIndex !in sets.indices) return
         sets.removeAt(setIndex)
         exercises[position] = exercise.copy(sets = sets)
         notifyItemChanged(position)
